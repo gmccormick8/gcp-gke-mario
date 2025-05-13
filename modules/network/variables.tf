@@ -19,6 +19,9 @@ variable "subnets" {
   type = map(object({
     region = string
     cidr   = string
+    secondary_ranges = optional(map(object({
+      ip_cidr_range = string
+    })))
   }))
 }
 

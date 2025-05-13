@@ -16,6 +16,14 @@ resource "google_compute_subnetwork" "subnets" {
   ip_cidr_range            = each.value.cidr
   private_ip_google_access = true
 
+  dynamic "secondary_ip_range" {
+    for_each = each.value.secondary_ranges != null ? each.value.secondary_ranges : {}
+    content {
+      range_name    = secondary_ip_range.key
+      ip_cidr_range = secondary_ip_range.value.ip_cidr_range
+    }
+  }
+
   log_config {
     aggregation_interval = "INTERVAL_5_SEC"
     flow_sampling        = 0.5

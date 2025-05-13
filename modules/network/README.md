@@ -46,11 +46,19 @@ module "network" {
   network_name = "my-vpc"
   routing_mode = "REGIONAL"
 
-  # Multiple subnet configuration
+  # Multiple subnet configuration with secondary ranges
   subnets = {
     "subnet-us-central" = {
       region = "us-central1"
       cidr   = "10.0.1.0/24"
+      secondary_ranges = {
+        "pods" = {
+          ip_cidr_range = "192.168.0.0/20"
+        }
+        "services" = {
+          ip_cidr_range = "192.168.16.0/24"
+        }
+      }
     }
     "subnet-us-east" = {
       region = "us-east1"
@@ -118,6 +126,11 @@ Each subnet requires:
 {
   region = string       # GCP region for the subnet
   cidr   = string       # CIDR range for the subnet
+  secondary_ranges = {  # Optional secondary IP ranges
+    range_name = {
+      ip_cidr_range = string
+    }
+  }
 }
 ```
 

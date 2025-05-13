@@ -9,10 +9,8 @@ echo "Setting up the environment..."
 echo 'project_id = "'"$DEVSHELL_PROJECT_ID"'"' > terraform.tfvars
 
 api_array=(
-  "container.googleapis.com"
-  "gkeconnect.googleapis.com"
-  "gkehub.googleapis.com"
   "compute.googleapis.com"
+  "container.googleapis.com"
 )
 
 for api in "${api_array[@]}";

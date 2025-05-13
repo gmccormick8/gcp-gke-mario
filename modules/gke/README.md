@@ -1,100 +1,95 @@
-# GCP GKE Cluster Terraform Module
+# GCP GKE Autopilot Module
 
-This module creates a secure Google Kubernetes Engine (GKE) cluster with associated resources including a dedicated service account, node pool, and Fleet membership.
+This module creates a secure Google Kubernetes Engine (GKE) Autopilot cluster with public access to workloads.
 
 ## Features
 
-- Private GKE cluster with authorized networks
-- Workload Identity configuration
-- Auto-scaling node pool with configurable limits
-- Shielded nodes with secure boot
-- Fleet membership for centralized management
-- Scheduled maintenance windows
-- Regular release channel
+- GKE Autopilot mode for automated management
+- Private nodes with public control plane access
+- Workload Identity enabled
+- Network Policy enforcement
+- Binary Authorization
+- Public load balancer access to workloads
+
+## Required APIs
+
+```bash
+container.googleapis.com              # Kubernetes Engine API
+compute.googleapis.com               # Compute Engine API
+cloudresourcemanager.googleapis.com  # Cloud Resource Manager API
+iam.googleapis.com                  # Identity and Access Management API
+serviceusage.googleapis.com         # Service Usage API
+monitoring.googleapis.com           # Cloud Monitoring API
+logging.googleapis.com              # Cloud Logging API
+```
 
 ## Usage
 
-Basic usage with minimal configuration:
-
 ```hcl
-module "gke" {
-  source       = "./modules/gke"
-  project_id   = "my-project"
-  cluster_name = "my-cluster"
-  zone       = "us-central1-a"
-  network_id   = module.network.network_id
-  subnet_id    = module.network.subnet_ids["subnet-name"]
-}
-```
+module "gke_cluster" {
+  source = "./modules/gke"
 
-Advanced usage with custom configuration:
-
-```hcl
-module "gke" {
-  source       = "./modules/gke"
-  project_id   = "my-project"
+  project_id   = "my-project-id"
   cluster_name = "my-cluster"
-  zone       = "us-central1-a"
-  network_id   = module.network.network_id
-  subnet_id    = module.network.subnet_ids["subnet-name"]
+  region       = "us-central1"
+
+  network_name = "my-vpc"
+  subnet_name  = "my-subnet"
 
   master_ipv4_cidr_block = "172.16.0.0/28"
-  machine_type           = "e2-standard-2"
-
-  total_min_node_count = 2
-  total_max_node_count = 5
-
-  authorized_networks = [
-    {
-      cidr_block   = "10.0.0.0/24"
-      display_name = "VPN Network"
-    }
-  ]
 }
 ```
 
 ## Requirements
 
-- Terraform >= 1.0
-- Google Provider >= 4.0
-- Google Project with necessary APIs enabled:
-  - container.googleapis.com
-  - gkeconnect.googleapis.com
-  - gkehub.googleapis.com
+- Terraform >= 1.11.0
+- Google Provider >= 6.30.0
+- A VPC network with secondary IP ranges configured for pods and services
+- Appropriate IAM permissions to create GKE clusters
 
-## Inputs
+## Variables
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| project_id | The GCP project ID | string | - | yes |
-| cluster_name | Name of the GKE cluster | string | - | yes |
-| zone | Zone where the cluster will be created | string | - | yes |
-| network_id | VPC network ID | string | - | yes |
-| subnet_id | Subnet ID | string | - | yes |
-| master_ipv4_cidr_block | CIDR block for the master network | string | "172.16.0.0/28" | no |
-| pods_ipv4_cidr_block | CIDR block for pods | string | "10.40.0.0/14" | no |
-| services_ipv4_cidr_block | CIDR block for services | string | "10.44.0.0/20" | no |
-| authorized_networks | List of authorized networks that can access the cluster | list(object) | [] | no |
-| total_min_node_count | Minimum number of nodes across all zones | number | 1 | no |
-| total_max_node_count | Maximum number of nodes across all zones | number | 3 | no |
-| machine_type | Machine type for nodes | string | "e2-micro" | no |
+| Name                   | Description                    | Type   | Required |
+| ---------------------- | ------------------------------ | ------ | -------- |
+| project_id             | The GCP project ID             | string | yes      |
+| cluster_name           | The name of the cluster        | string | yes      |
+| region                 | The region to host the cluster | string | yes      |
+| network_name           | The VPC network name           | string | yes      |
+| subnet_name            | The subnet name                | string | yes      |
+| master_ipv4_cidr_block | CIDR for the control plane     | string | no       |
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| cluster_id | The ID of the GKE cluster |
-| fleet_membership_id | The ID of the Fleet membership |
-| service_account_id | The ID of the GKE service account |
+| Name             | Description                              |
+| ---------------- | ---------------------------------------- |
+| cluster_id       | The full ID of the GKE cluster           |
+| cluster_name     | The name of the GKE cluster              |
+| cluster_endpoint | The IP address of the cluster master     |
+| cluster_location | The cluster's location                   |
+| master_auth      | The cluster's authentication information |
 
 ## Security Features
 
-- Private cluster with no public endpoint
-- Authorized networks for master access
-- Workload Identity for pod authentication
-- Shielded nodes with secure boot and integrity monitoring
-- Auto-upgrading and auto-repairing nodes
-- Regular security patches via maintenance windows
+- Private nodes with public endpoint
+- Workload Identity for secure service account management
+- Network Policy enforcement for pod-to-pod traffic control
+- Binary Authorization for secure deployments
+- Vulnerability scanning enabled
+- Master authorized networks configured for public access
+- Regular release channel for stable updates
+
+## Limitations
+
+- Autopilot mode has some restrictions on pod configurations
+- Node pools cannot be manually configured
+- Some Kubernetes features may not be available
+
+## Network Requirements
+
+The VPC must have secondary IP ranges configured for:
+
+- Pods: `[subnet-name]-pods`
+- Services: `[subnet-name]-services`
 
 ## License
 

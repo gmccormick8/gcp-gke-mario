@@ -8,6 +8,14 @@ module "prod-vpc" {
     "prod-central-vpc" = {
       region = "us-central1"
       cidr   = "10.0.0.0/24"
+      secondary_ranges = {
+        "prod-central-pods" = {
+          ip_cidr_range = "192.168.0.0/24"
+        }
+        "prod-central-services" = {
+          ip_cidr_range = "192.168.10.0/24"
+        }
+      }
     }
   }
 
@@ -35,18 +43,34 @@ module "prod-vpc" {
   cloud_nat_configs = ["us-central1"]
 }
 
-module "prod_central_cluster" {
-  source       = "./modules/gke"
-  project_id   = var.project_id
-  cluster_name = "prod-cluster-central"
-  region       = "us-central1"
-  network_id   = module.prod-vpc.network_id
-  subnet_id    = module.prod-vpc.subnet_ids["prod-central-vpc"]
+resource "google_service_account" "gke_sa" {
+  account_id   = "gke-sa"
+  display_name = "GKE Service Account" 
+}
 
-  authorized_networks = [
-    {
-      cidr_block   = "10.0.0.0/24"
-      display_name = "Prod Central VPC"
-    }
-  ]
+resource "google_project_iam_member" "gke_sa_log_write_role" {
+  project = var.project_id
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:${google_service_account.gke_sa.email}"
+}
+
+resource "google_project_iam_member" "gke_sa_metric_write_role" {
+  project = var.project_id
+  role    = "roles/monitoring.metricWriter"
+  member  = "serviceAccount:${google_service_account.gke_sa.email}"
+}
+
+
+
+module "" {
+  source = "./modules/gke"
+}
+
+module "k8s-mario" {
+  source = "./modules/k8s"
+  cluster_name = "mario-cluster"
+  cluster_location = "us-central1"
+  min_replicas = 1
+  max_replicas = 5
+  image = "kaminskypavel/mario:latest"
 }
