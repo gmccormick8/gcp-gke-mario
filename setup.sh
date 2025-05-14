@@ -11,6 +11,12 @@ echo 'project_id = "'"$DEVSHELL_PROJECT_ID"'"' > terraform.tfvars
 api_array=(
   "compute.googleapis.com"
   "container.googleapis.com"
+  "cloudresourcemanager.googleapis.com"
+  "iam.googleapis.com"
+  "serviceusage.googleapis.com"
+  "monitoring.googleapis.com"
+  "logging.googleapis.com"
+  "containerregistry.googleapis.com"
 )
 
 for api in "${api_array[@]}";
