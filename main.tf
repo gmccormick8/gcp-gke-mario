@@ -62,5 +62,4 @@ module "k8s-mario" {
   min_replicas     = 1
   max_replicas     = 5
   image            = "kaminskypavel/mario:latest"
-  depends_on = [ module.cluster-central ]
 }
