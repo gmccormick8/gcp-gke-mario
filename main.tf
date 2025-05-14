@@ -45,22 +45,22 @@ module "prod-vpc" {
 
 
 module "cluster-central" {
-  source = "./modules/gke"
-  project_id = var.project_id
-  cluster_name = "central-cluster"
-  region = "us-central1"
-  network_name = module.prod-vpc.network_name
-  subnet_name  = module.prod-vpc.subnet_name
-  pods_cidr = module.prod-vpc.pods_cidr
-  services_cidr = module.prod-vpc.services_cidr
+  source                 = "./modules/gke"
+  project_id             = var.project_id
+  cluster_name           = "central-cluster"
+  region                 = "us-central1"
+  network_name           = module.prod-vpc.network_self_link
+  subnet_name            = module.prod-vpc.subnets["prod-central-vpc"].name
+  pods_cidr              = module.prod-vpc.secondary_ranges["prod-central-pods"].name
+  services_cidr          = module.prod-vpc.secondary_ranges["prod-central-services"].name
   master_ipv4_cidr_block = "172.16.0.0/28"
 }
 
 module "k8s-mario" {
-  source = "./modules/k8s"
-  cluster_name = "mario-cluster"
-  cluster_location = "us-central1"
-  min_replicas = 1
-  max_replicas = 5
-  image = "kaminskypavel/mario:latest"
+  source           = "./modules/k8s"
+  cluster_name     = module.cluster-central.cluster_name
+  cluster_location = module.cluster-central.cluster_region
+  min_replicas     = 1
+  max_replicas     = 5
+  image            = "kaminskypavel/mario:latest"
 }

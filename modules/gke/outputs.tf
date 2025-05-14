@@ -8,14 +8,9 @@ output "cluster_name" {
   value       = google_container_cluster.primary.name
 }
 
-output "cluster_endpoint" {
-  description = "The IP address of the cluster's Kubernetes master"
-  value       = google_container_cluster.primary.endpoint
-}
-
-output "cluster_location" {
-  description = "The location of the cluster"
-  value       = google_container_cluster.primary.location
+output "cluster_region" {
+  description = "The region of the cluster"
+  value       = google_container_cluster.primary.region
 }
 
 output "master_auth" {

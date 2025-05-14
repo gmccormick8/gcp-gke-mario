@@ -44,10 +44,10 @@ resource "google_container_cluster" "primary" {
     master_ipv4_cidr_block  = var.master_ipv4_cidr_block
   }
 
-  
+
   ip_allocation_policy {
-    cluster_secondary_range_name  = "${var.pods_cidr}"
-    services_secondary_range_name = "${var.services_cidr}"
+    cluster_secondary_range_name  = var.pods_cidr
+    services_secondary_range_name = var.services_cidr
   }
 
   release_channel {

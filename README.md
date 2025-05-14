@@ -4,9 +4,13 @@ A GKE deployment of Super Mario in the browser.
 
 ## Prerequisites
 
+### Version Requirements
+
 - Google Cloud SDK
-- Terraform >= 1.11.0
+- Terraform ~> 1.11.0
 - kubectl
+
+The tilde (~>) operator allows only the rightmost version component to increment. For example, `~> 1.11` allows installing versions 1.11.0 up to but not including 1.12.0.
 
 ## Setup
 
