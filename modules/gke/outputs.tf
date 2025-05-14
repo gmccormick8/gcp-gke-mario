@@ -8,9 +8,9 @@ output "cluster_name" {
   value       = google_container_cluster.primary.name
 }
 
-output "cluster_region" {
-  description = "The region of the cluster"
-  value       = google_container_cluster.primary.region
+output "cluster_location" {
+  description = "The location of the cluster"
+  value       = google_container_cluster.primary.location
 }
 
 output "master_auth" {
