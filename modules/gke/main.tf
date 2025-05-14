@@ -1,14 +1,3 @@
-data "google_compute_network" "network" {
-  name    = var.network_name
-  project = var.project_id
-}
-
-data "google_compute_subnetwork" "subnet" {
-  name    = var.subnet_name
-  project = var.project_id
-  region  = var.region
-}
-
 resource "google_service_account" "gke_sa" {
   account_id   = "gke-${var.region}-sa"
   display_name = "GKE Service Account for ${var.region}"
@@ -35,8 +24,8 @@ resource "google_container_cluster" "primary" {
 
   deletion_protection = false
 
-  network    = data.google_compute_network.network.self_link
-  subnetwork = data.google_compute_subnetwork.subnet.self_link
+  network    = var.network_name
+  subnetwork = var.subnet_name
 
   private_cluster_config {
     enable_private_nodes    = true
