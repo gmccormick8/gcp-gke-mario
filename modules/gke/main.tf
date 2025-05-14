@@ -9,32 +9,47 @@ data "google_compute_subnetwork" "subnet" {
   region  = var.region
 }
 
+resource "google_service_account" "gke_sa" {
+  account_id   = "gke-${var.region}-sa"
+  display_name = "GKE Service Account for ${var.region}"
+}
+
+resource "google_project_iam_member" "gke_sa_log_write_role" {
+  project = var.project_id
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:${google_service_account.gke_sa.email}"
+}
+
+resource "google_project_iam_member" "gke_sa_metric_write_role" {
+  project = var.project_id
+  role    = "roles/monitoring.metricWriter"
+  member  = "serviceAccount:${google_service_account.gke_sa.email}"
+}
+
 resource "google_container_cluster" "primary" {
   name     = var.cluster_name
   location = var.region
   project  = var.project_id
 
-  # Enable Autopilot
   enable_autopilot = true
 
-  # Network configuration
+  deletion_protection = false
+
   network    = data.google_compute_network.network.self_link
   subnetwork = data.google_compute_subnetwork.subnet.self_link
 
-  # Private cluster configuration
   private_cluster_config {
     enable_private_nodes    = true
     enable_private_endpoint = false
     master_ipv4_cidr_block  = var.master_ipv4_cidr_block
   }
 
-  # IP allocation policy
+  
   ip_allocation_policy {
-    cluster_secondary_range_name  = "${var.subnet_name}-pods"
-    services_secondary_range_name = "${var.subnet_name}-services"
+    cluster_secondary_range_name  = "${var.pods_cidr}"
+    services_secondary_range_name = "${var.services_cidr}"
   }
 
-  # Release channel
   release_channel {
     channel = "REGULAR"
   }
@@ -47,19 +62,21 @@ resource "google_container_cluster" "primary" {
     }
   }
 
-  # Workload identity
   workload_identity_config {
     workload_pool = "${var.project_id}.svc.id.goog"
   }
 
-  # Network policy
-  network_policy {
-    enabled  = true
-    provider = "PROVIDER_UNSPECIFIED" # Autopilot manages this
-  }
-
-  # Binary authorization
   binary_authorization {
     evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
+  }
+
+  cluster_autoscaling {
+    auto_provisioning_defaults {
+      service_account = google_service_account.gke_sa.email
+      oauth_scopes = [
+        "https://www.googleapis.com/auth/monitoring",
+        "https://www.googleapis.com/auth/logging.write",
+      ]
+    }
   }
 }

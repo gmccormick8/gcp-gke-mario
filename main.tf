@@ -43,27 +43,17 @@ module "prod-vpc" {
   cloud_nat_configs = ["us-central1"]
 }
 
-resource "google_service_account" "gke_sa" {
-  account_id   = "gke-sa"
-  display_name = "GKE Service Account" 
-}
 
-resource "google_project_iam_member" "gke_sa_log_write_role" {
-  project = var.project_id
-  role    = "roles/logging.logWriter"
-  member  = "serviceAccount:${google_service_account.gke_sa.email}"
-}
-
-resource "google_project_iam_member" "gke_sa_metric_write_role" {
-  project = var.project_id
-  role    = "roles/monitoring.metricWriter"
-  member  = "serviceAccount:${google_service_account.gke_sa.email}"
-}
-
-
-
-module "" {
+module "cluster-central" {
   source = "./modules/gke"
+  project_id = var.project_id
+  cluster_name = "central-cluster"
+  region = "us-central1"
+  network_name = module.prod-vpc.network_name
+  subnet_name  = module.prod-vpc.subnet_name
+  pods_cidr = module.prod-vpc.pods_cidr
+  services_cidr = module.prod-vpc.services_cidr
+  master_ipv4_cidr_block = "172.16.0.0/28"
 }
 
 module "k8s-mario" {
