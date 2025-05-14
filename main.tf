@@ -57,10 +57,9 @@ module "cluster-central" {
 
 module "k8s-mario" {
   source           = "./modules/k8s"
-  cluster_name     = module.cluster-central.cluster_name
-  cluster_location = module.cluster-central.cluster_location
+  cluster_name     = "${module.cluster-central.cluster_name}"
+  cluster_location = "${module.cluster-central.cluster_location}"
   min_replicas     = 1
   max_replicas     = 5
   image            = "kaminskypavel/mario:latest"
-  depends_on = [ module.cluster-central ]
 }
