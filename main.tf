@@ -10,10 +10,10 @@ module "prod-vpc" {
       cidr   = "10.0.0.0/24"
       secondary_ranges = {
         "prod-central-pods" = {
-          ip_cidr_range = "192.168.0.0/24"
+          ip_cidr_range = "192.168.0.0/17"
         }
         "prod-central-services" = {
-          ip_cidr_range = "192.168.10.0/24"
+          ip_cidr_range = "192.168.128.0/17"
         }
       }
     }
@@ -24,7 +24,7 @@ module "prod-vpc" {
       direction     = "INGRESS"
       source_ranges = ["35.235.240.0/20"]
       target_tags   = ["http-server"]
-      allow = [{
+        allow = [{
         protocol = "tcp"
         ports    = ["22"]
       }]
