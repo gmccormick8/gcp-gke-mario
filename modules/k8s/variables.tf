@@ -24,3 +24,13 @@ variable "max_replicas" {
   type        = number
   default     = 5
 }
+
+variable "cluster_endpoint" {
+  description = "The cluster endpoint"
+  type        = string
+}
+
+variable "cluster_ca_certificate" {
+  description = "The cluster ca certificate (base64 encoded)"
+  type        = string
+}
