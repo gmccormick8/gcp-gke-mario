@@ -43,16 +43,15 @@ module "prod-vpc" {
   cloud_nat_configs = ["us-central1"]
 }
 
-
 module "cluster-central" {
   source                 = "./modules/gke"
   project_id             = var.project_id
   cluster_name           = "central-cluster"
   region                 = "us-central1"
   network_name           = module.prod-vpc.network_self_link
-  subnet_name            = module.prod-vpc.subnets["prod-central-vpc"].name
-  pods_cidr              = module.prod-vpc.secondary_ranges["prod-central-pods"].name
-  services_cidr          = module.prod-vpc.secondary_ranges["prod-central-services"].name
+  subnet_name            = "prod-central-vpc"      # Direct reference to subnet name
+  pods_cidr              = "prod-central-pods"     # Direct reference to secondary range name
+  services_cidr          = "prod-central-services" # Direct reference to secondary range name
   master_ipv4_cidr_block = "172.16.0.0/28"
 }
 
