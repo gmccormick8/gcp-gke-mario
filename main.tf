@@ -63,5 +63,5 @@ module "k8s-mario" {
   cluster_ca_certificate = module.cluster-central.master_auth.cluster_ca_certificate
   min_replicas           = 1
   max_replicas           = 5
-  image                  = "kaminskypavel/mario:latest"
+  image                  = "docker.io/sevenajay/mario:latest"
 }
