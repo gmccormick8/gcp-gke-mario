@@ -29,7 +29,7 @@ resource "google_container_cluster" "primary" {
 
   private_cluster_config {
     enable_private_nodes    = true
-    enable_private_endpoint = true
+    enable_private_endpoint = false
     master_ipv4_cidr_block  = var.master_ipv4_cidr_block
   }
 
@@ -45,8 +45,8 @@ resource "google_container_cluster" "primary" {
 
     master_authorized_networks_config {
     cidr_blocks {
-      cidr_block   = "35.235.240.0/20"
-      display_name = "gke-master-authorized-networks"
+      cidr_block   = "0.0.0.0/0"
+      display_name = "all"
     }
   }
 
