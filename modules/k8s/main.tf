@@ -59,7 +59,6 @@ resource "kubernetes_deployment_v1" "mario_v1" {
           security_context {
             allow_privilege_escalation = false
             privileged                 = false
-            read_only_root_filesystem  = true
           }
 
         }
