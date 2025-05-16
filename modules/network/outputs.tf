@@ -25,5 +25,10 @@ output "subnet_ids" {
 
 output "secondary_ranges" {
   description = "Map of secondary ranges"
-  value       = { for k, v in google_compute_subnetwork.subnets : k => v.secondary_ip_range }
+  value = { for k, v in google_compute_subnetwork.subnets : k =>
+    {
+      name  = k
+      range = v.secondary_ip_range
+    }
+  }
 }

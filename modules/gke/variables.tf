@@ -28,12 +28,12 @@ variable "master_ipv4_cidr_block" {
   type        = string
 }
 
-variable "pods_cidr" {
-  description = "The CIDR block for the pods IP range."
+variable "pods_network_name" {
+  description = "The name of the secondary range for pods"
   type        = string
 }
 
-variable "services_cidr" {
-  description = "The CIDR block for the services IP range."
+variable "services_network_name" {
+  description = "The name of the secondary range for services"
   type        = string
 }

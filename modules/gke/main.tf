@@ -29,25 +29,24 @@ resource "google_container_cluster" "primary" {
 
   private_cluster_config {
     enable_private_nodes    = true
-    enable_private_endpoint = false
+    enable_private_endpoint = true
     master_ipv4_cidr_block  = var.master_ipv4_cidr_block
   }
 
 
   ip_allocation_policy {
-    cluster_secondary_range_name  = var.pods_cidr
-    services_secondary_range_name = var.services_cidr
+    cluster_secondary_range_name  = var.pods_network_name
+    services_secondary_range_name = var.services_network_name
   }
 
   release_channel {
     channel = "REGULAR"
   }
 
-  # Master authorized networks - allow all for public workload access
-  master_authorized_networks_config {
+    master_authorized_networks_config {
     cidr_blocks {
-      cidr_block   = "0.0.0.0/0"
-      display_name = "all"
+      cidr_block   = "35.235.240.0/20"
+      display_name = "gke-master-authorized-networks"
     }
   }
 
