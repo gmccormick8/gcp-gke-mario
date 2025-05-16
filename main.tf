@@ -24,7 +24,7 @@ module "prod-vpc" {
       direction     = "INGRESS"
       source_ranges = ["35.235.240.0/20"]
       target_tags   = ["http-server"]
-        allow = [{
+      allow = [{
         protocol = "tcp"
         ports    = ["22"]
       }]
@@ -49,9 +49,9 @@ module "cluster-central" {
   cluster_name           = "central-cluster"
   region                 = "us-central1"
   network_name           = module.prod-vpc.network_self_link
-  subnet_name            = "prod-central-vpc"      # Direct reference to subnet name
-  pods_cidr              = "prod-central-pods"     # Direct reference to secondary range name
-  services_cidr          = "prod-central-services" # Direct reference to secondary range name
+  subnet_name            = module.prod-vpc.subnets["prod-central-vpc"].self_link
+  pods_cidr              = module.prod-vpc.subnets["prod-central-vpc"].secondary_ranges["prod-central-pods"].self_link
+  services_cidr          = module.prod-vpc.subnets["prod-central-vpc"].secondary_ranges["prod-central-services"].self_link
   master_ipv4_cidr_block = "172.16.0.0/28"
 }
 

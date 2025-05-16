@@ -97,7 +97,7 @@ resource "kubernetes_ingress_v1" "ingress" {
     name      = "mario-ingress"
     namespace = kubernetes_namespace.mario.metadata[0].name
     annotations = {
-      "kubernetes.io/ingress.class" = "nginx"
+      "kubernetes.io/ingress.class"                = "nginx"
       "nginx.ingress.kubernetes.io/rewrite-target" = "/"
     }
   }
@@ -112,7 +112,7 @@ resource "kubernetes_ingress_v1" "ingress" {
       }
     }
   }
-  
+
 }
 
 resource "kubernetes_horizontal_pod_autoscaler_v2" "hpa" {
