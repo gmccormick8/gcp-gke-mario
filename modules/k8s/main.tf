@@ -92,29 +92,6 @@ resource "kubernetes_service_v1" "default" {
 
 }
 
-resource "kubernetes_ingress_v1" "ingress" {
-  metadata {
-    name      = "mario-ingress"
-    namespace = kubernetes_namespace.mario.metadata[0].name
-    annotations = {
-      "kubernetes.io/ingress.class"                = "nginx"
-      "nginx.ingress.kubernetes.io/rewrite-target" = "/"
-    }
-  }
-
-  spec {
-    default_backend {
-      service {
-        name = kubernetes_service_v1.default.metadata[0].name
-        port {
-          number = kubernetes_service_v1.default.spec[0].port[0].port
-        }
-      }
-    }
-  }
-
-}
-
 resource "kubernetes_horizontal_pod_autoscaler_v2" "hpa" {
   metadata {
     name      = "mario-hpa"

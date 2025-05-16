@@ -19,27 +19,6 @@ module "prod-vpc" {
     }
   }
 
-  firewall_rules = {
-    "allow-inbound-iap-ssh-access" = {
-      direction     = "INGRESS"
-      source_ranges = ["35.235.240.0/20"]
-      target_tags   = ["http-server"]
-      allow = [{
-        protocol = "tcp"
-        ports    = ["22"]
-      }]
-    }
-    "allow-inbound-http-access" = {
-      direction     = "INGRESS"
-      source_ranges = ["0.0.0.0/0"]
-      target_tags   = ["http-server"]
-      allow = [{
-        protocol = "tcp"
-        ports    = ["80"]
-      }]
-    }
-  }
-
   cloud_nat_configs = ["us-central1"]
 }
 
@@ -55,7 +34,7 @@ module "cluster-central" {
   master_ipv4_cidr_block = "172.16.0.0/28"
 }
 
-/*module "k8s-mario" {
+module "k8s-mario" {
   source                 = "./modules/k8s"
   cluster_name           = module.cluster-central.cluster_name
   cluster_location       = module.cluster-central.cluster_location
@@ -65,4 +44,3 @@ module "cluster-central" {
   max_replicas           = 5
   image                  = "sevenajay/mario:latest"
 }
-*/
