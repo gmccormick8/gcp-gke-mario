@@ -50,8 +50,8 @@ module "cluster-central" {
   region                 = "us-central1"
   network_name           = module.prod-vpc.network_self_link
   subnet_name            = module.prod-vpc.subnets["prod-central-vpc"].self_link
-  pods_cidr              = module.prod-vpc.secondary_ranges["prod-central-vpc"].secondary_ranges["prod-central-pods"]
-  services_cidr          = module.prod-vpc.secondary_ranges["prod-central-vpc"].secondary_ranges["prod-central-services"]
+  pods_cidr              = "prod-central-pods"
+  services_cidr          = "prod-central-services"
   master_ipv4_cidr_block = "172.16.0.0/28"
 }
 
