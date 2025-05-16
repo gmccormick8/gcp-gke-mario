@@ -55,7 +55,7 @@ module "cluster-central" {
   master_ipv4_cidr_block = "172.16.0.0/28"
 }
 
-module "k8s-mario" {
+/*module "k8s-mario" {
   source                 = "./modules/k8s"
   cluster_name           = module.cluster-central.cluster_name
   cluster_location       = module.cluster-central.cluster_location
@@ -63,5 +63,6 @@ module "k8s-mario" {
   cluster_ca_certificate = module.cluster-central.master_auth.cluster_ca_certificate
   min_replicas           = 1
   max_replicas           = 5
-  image                  = "docker.io/sevenajay/mario:latest"
+  image                  = "sevenajay/mario:latest"
 }
+*/
