@@ -51,12 +51,12 @@ resource "google_container_cluster" "primary" {
     }
   }
 
-  workload_identity_config {
-    workload_pool = "${var.project_id}.svc.id.goog"
-  }
-
   gateway_api_config {
     channel = "CHANNEL_STANDARD"
+  }
+
+  workload_identity_config {
+    workload_pool = "${var.project_id}.svc.id.goog"
   }
 
   binary_authorization {
@@ -67,7 +67,8 @@ resource "google_container_cluster" "primary" {
     auto_provisioning_defaults {
       service_account = google_service_account.gke_sa.email
       oauth_scopes = [
-        "https://www.googleapis.com/auth/cloud-platform"
+        "https://www.googleapis.com/auth/monitoring.write",
+        "https://www.googleapis.com/auth/logging.write"
       ]
     }
   }

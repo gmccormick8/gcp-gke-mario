@@ -104,7 +104,7 @@ resource "kubernetes_horizontal_pod_autoscaler_v2" "hpa" {
 
     scale_target_ref {
       kind = "Deployment"
-      name = kubernetes_deployment_v1.mario_v1.metadata[0].name
+      name = kubernetes_deployment_v1.mario_v1.metadata[0].labels["app"]
     }
 
     metric {
