@@ -87,10 +87,10 @@ module "prod-west-cluster" {
 
 module "k8s-mario" {
   source                 = "./modules/k8s"
-  cluster_name           = module.cluster-central.cluster_name
-  cluster_location       = module.cluster-central.cluster_location
-  cluster_endpoint       = module.cluster-central.cluster_endpoint
-  cluster_ca_certificate = module.cluster-central.master_auth.cluster_ca_certificate
+  cluster_name           = module.prod-cluster-central.cluster_name
+  cluster_location       = module.prod-cluster-central.cluster_location
+  cluster_endpoint       = module.prod-cluster-central.cluster_endpoint
+  cluster_ca_certificate = module.prod-cluster-central.master_auth.cluster_ca_certificate
   min_replicas           = 1
   max_replicas           = 5
   image                  = "sevenajay/mario:latest"
