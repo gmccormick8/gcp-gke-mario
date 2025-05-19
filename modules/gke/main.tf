@@ -43,10 +43,11 @@ resource "google_container_cluster" "primary" {
     channel = "REGULAR"
   }
 
-    master_authorized_networks_config {
+  master_authorized_networks_config {
+    gcp_public_cidrs_access_enabled = true
     cidr_blocks {
-      cidr_block   = "0.0.0.0/0"
-      display_name = "all"
+      cidr_block   = "${var.public_ip}/32"
+      display_name = "allow-current-host"
     }
   }
 
@@ -62,7 +63,8 @@ resource "google_container_cluster" "primary" {
     auto_provisioning_defaults {
       service_account = google_service_account.gke_sa.email
       oauth_scopes = [
-        "https://www.googleapis.com/auth/cloud-platform"
+        "https://www.googleapis.com/auth/monitoring",
+        "https://www.googleapis.com/auth/logging.write"
       ]
     }
   }

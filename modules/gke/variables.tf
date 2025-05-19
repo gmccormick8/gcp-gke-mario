@@ -37,3 +37,8 @@ variable "services_network_name" {
   description = "The name of the secondary range for services"
   type        = string
 }
+
+variable "public_ip" {
+  description = "This host's current Public IP, will be added to the master authorized networks"
+  type        = string
+}
