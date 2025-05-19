@@ -6,7 +6,7 @@ module "prod-vpc" {
 
   subnets = {
     "prod-east-vpc" = {
-      region = "us-east4"
+      region = "us-east5"
       cidr   = "10.0.0.0/24"
       secondary_ranges = {
         "prod-east-pods" = {
