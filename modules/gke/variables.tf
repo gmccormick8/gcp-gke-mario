@@ -43,14 +43,14 @@ variable "public_ip" {
   type        = string
 }
 
-variable "total_min_node_count" {
-  description = "Minimum number of all nodes in the node pool"
+variable "min_node_count" {
+  description = "Minimum number of nodes in the node pool"
   type        = number
   default     = 1
 }
 
-variable "total_max_node_count" {
-  description = "Maximum number of all nodes in the node pool"
+variable "max_node_count" {
+  description = "Maximum number of nodes in the node pool"
   type        = number
   default     = 3
 }

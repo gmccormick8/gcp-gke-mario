@@ -28,27 +28,9 @@ resource "google_container_cluster" "primary" {
   remove_default_node_pool = true
   initial_node_count       = 1
 
-  private_cluster_config {
-    enable_private_nodes    = true
-    enable_private_endpoint = false
-    master_ipv4_cidr_block  = var.master_ipv4_cidr_block
-  }
-
   ip_allocation_policy {
     cluster_secondary_range_name  = var.pods_network_name
     services_secondary_range_name = var.services_network_name
-  }
-
-  release_channel {
-    channel = "REGULAR"
-  }
-
-  master_authorized_networks_config {
-    gcp_public_cidrs_access_enabled = true
-    cidr_blocks {
-      cidr_block   = "${var.public_ip}/32"
-      display_name = "allow-current-host"
-    }
   }
 
   vertical_pod_autoscaling {
@@ -63,8 +45,26 @@ resource "google_container_cluster" "primary" {
     workload_pool = "${var.project_id}.svc.id.goog"
   }
 
+  private_cluster_config {
+    enable_private_nodes    = true
+    enable_private_endpoint = false
+    master_ipv4_cidr_block  = var.master_ipv4_cidr_block
+  }
+
+  master_authorized_networks_config {
+    gcp_public_cidrs_access_enabled = true
+    cidr_blocks {
+      cidr_block   = "${var.public_ip}/32"
+      display_name = "allow-current-host"
+    }
+  }
+ 
   binary_authorization {
     evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
+  }
+
+  release_channel {
+    channel = "REGULAR"
   }
 }
 
@@ -75,8 +75,8 @@ resource "google_container_node_pool" "primary_nodes" {
   project  = var.project_id
 
   autoscaling {
-    total_min_node_count = var.total_min_node_count
-    total_max_node_count = var.total_max_node_count
+    min_node_count = var.min_node_count
+    max_node_count = var.max_node_count
   }
 
   node_config {
@@ -87,7 +87,8 @@ resource "google_container_node_pool" "primary_nodes" {
 
     service_account = google_service_account.gke_sa.email
     oauth_scopes = [
-      "https://www.googleapis.com/auth/cloud-platform"
+      "https://www.googleapis.com/auth/monitoring.write",
+      "https://www.googleapis.com/auth/logging.write",
     ]
   }
 

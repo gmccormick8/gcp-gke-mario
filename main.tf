@@ -43,7 +43,7 @@ module "prod-vpc" {
     }
   }
 
-  cloud_nat_configs = ["us-east4", "us-central1", "us-west4"]
+  cloud_nat_configs = [subnets["prod-east-vpc"].region, subnets["prod-central-vpc"].region, subnets["prod-west-vpc"].region]
 }
 
 module "prod-east-cluster" {
@@ -57,8 +57,8 @@ module "prod-east-cluster" {
   services_network_name  = "prod-east-services"
   master_ipv4_cidr_block = "172.16.0.0/28"
   public_ip              = var.public_ip
-  total_min_node_count   = 1
-  total_max_node_count   = 3
+  min_node_count         = 1
+  max_node_count         = 3
   machine_type           = "e2-standard-4"
   disk_size_gb           = 50
   disk_type              = "pd-standard"
@@ -75,8 +75,8 @@ module "prod-central-cluster" {
   services_network_name  = "prod-central-services"
   master_ipv4_cidr_block = "172.16.1.0/28"
   public_ip              = var.public_ip
-  total_min_node_count   = 1
-  total_max_node_count   = 3
+  min_node_count         = 1
+  max_node_count         = 3
   machine_type           = "e2-standard-4"
   disk_size_gb           = 50
   disk_type              = "pd-standard"
@@ -93,8 +93,8 @@ module "prod-west-cluster" {
   services_network_name  = "prod-west-services"
   master_ipv4_cidr_block = "172.16.2.0/28"
   public_ip              = var.public_ip
-  total_min_node_count   = 1
-  total_max_node_count   = 3
+  min_node_count         = 1
+  max_node_count         = 3
   machine_type           = "e2-standard-4"
   disk_size_gb           = 50
   disk_type              = "pd-standard"
