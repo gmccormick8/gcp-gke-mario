@@ -8,8 +8,8 @@ variable "cluster_name" {
   type        = string
 }
 
-variable "region" {
-  description = "The region to host the cluster in"
+variable "zone" {
+  description = "The zone to host the cluster in"
   type        = string
 }
 

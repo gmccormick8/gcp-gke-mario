@@ -1,6 +1,6 @@
 resource "google_service_account" "gke_sa" {
-  account_id   = "gke-${var.region}-sa"
-  display_name = "GKE Service Account for ${var.region}"
+  account_id   = "gke-${var.zone}-sa"
+  display_name = "GKE Service Account for ${var.zone}"
 }
 
 resource "google_project_iam_member" "gke_sa_log_write_role" {
@@ -17,7 +17,7 @@ resource "google_project_iam_member" "gke_sa_metric_write_role" {
 
 resource "google_container_cluster" "primary" {
   name     = var.cluster_name
-  location = var.region
+  location = var.zone
   project  = var.project_id
 
   deletion_protection = false
@@ -70,7 +70,7 @@ resource "google_container_cluster" "primary" {
 
 resource "google_container_node_pool" "primary_nodes" {
   name     = "${var.cluster_name}-node-pool"
-  location = var.region
+  location = var.zone
   cluster  = google_container_cluster.primary.name
   project  = var.project_id
 

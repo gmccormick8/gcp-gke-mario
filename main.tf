@@ -50,7 +50,7 @@ module "prod-east-cluster" {
   source                 = "./modules/gke"
   project_id             = var.project_id
   cluster_name           = "east-cluster"
-  region                 = module.prod-vpc.subnets["prod-east-vpc"].region
+  zone                   = "us-east5-a"
   network_name           = module.prod-vpc.network_self_link
   subnet_name            = module.prod-vpc.subnets["prod-east-vpc"].self_link
   pods_network_name      = "prod-east-pods"
@@ -68,7 +68,7 @@ module "prod-central-cluster" {
   source                 = "./modules/gke"
   project_id             = var.project_id
   cluster_name           = "central-cluster"
-  region                 = module.prod-vpc.subnets["prod-central-vpc"].region
+  zone                   = "us-central1-a"
   network_name           = module.prod-vpc.network_self_link
   subnet_name            = module.prod-vpc.subnets["prod-central-vpc"].self_link
   pods_network_name      = "prod-central-pods"
@@ -86,7 +86,7 @@ module "prod-west-cluster" {
   source                 = "./modules/gke"
   project_id             = var.project_id
   cluster_name           = "west-cluster"
-  region                 = module.prod-vpc.subnets["prod-west-vpc"].region
+  zone                   = "us-west2-a"
   network_name           = module.prod-vpc.network_self_link
   subnet_name            = module.prod-vpc.subnets["prod-west-vpc"].self_link
   pods_network_name      = "prod-west-pods"
