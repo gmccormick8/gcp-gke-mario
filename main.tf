@@ -30,7 +30,7 @@ module "prod-vpc" {
       }
     }
     "prod-west-vpc" = {
-      region = "us-west4"
+      region = "us-west2"
       cidr   = "10.0.2.0/24"
       secondary_ranges = {
         "prod-west-pods" = {
@@ -57,8 +57,8 @@ module "prod-east-cluster" {
   services_network_name  = "prod-east-services"
   master_ipv4_cidr_block = "172.16.0.0/28"
   public_ip              = var.public_ip
-  total_min_node_count         = 1
-  total_max_node_count         = 3
+  total_min_node_count   = 1
+  total_max_node_count   = 3
   machine_type           = "e2-standard-4"
   disk_size_gb           = 50
   disk_type              = "pd-standard"
@@ -75,8 +75,8 @@ module "prod-central-cluster" {
   services_network_name  = "prod-central-services"
   master_ipv4_cidr_block = "172.16.1.0/28"
   public_ip              = var.public_ip
-  total_min_node_count         = 1
-  total_max_node_count         = 3
+  total_min_node_count   = 1
+  total_max_node_count   = 3
   machine_type           = "e2-standard-4"
   disk_size_gb           = 50
   disk_type              = "pd-standard"
@@ -93,8 +93,8 @@ module "prod-west-cluster" {
   services_network_name  = "prod-west-services"
   master_ipv4_cidr_block = "172.16.2.0/28"
   public_ip              = var.public_ip
-  total_min_node_count         = 1
-  total_max_node_count         = 3
+  total_min_node_count   = 1
+  total_max_node_count   = 3
   machine_type           = "e2-standard-4"
   disk_size_gb           = 50
   disk_type              = "pd-standard"
