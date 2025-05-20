@@ -20,19 +20,19 @@ resource "google_container_cluster" "primary" {
   location = var.region
   project  = var.project_id
 
-  enable_autopilot = true
-
   deletion_protection = false
 
   network    = var.network_name
   subnetwork = var.subnet_name
+
+  remove_default_node_pool = true
+  initial_node_count       = 1
 
   private_cluster_config {
     enable_private_nodes    = true
     enable_private_endpoint = false
     master_ipv4_cidr_block  = var.master_ipv4_cidr_block
   }
-
 
   ip_allocation_policy {
     cluster_secondary_range_name  = var.pods_network_name
@@ -51,6 +51,10 @@ resource "google_container_cluster" "primary" {
     }
   }
 
+  vertical_pod_autoscaling {
+    enabled = false
+  }
+
   gateway_api_config {
     channel = "CHANNEL_STANDARD"
   }
@@ -62,18 +66,38 @@ resource "google_container_cluster" "primary" {
   binary_authorization {
     evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
   }
+}
 
-  cluster_autoscaling {
-    auto_provisioning_defaults {
-      service_account = google_service_account.gke_sa.email
-      oauth_scopes = [
-        "https://www.googleapis.com/auth/monitoring.write",
-        "https://www.googleapis.com/auth/logging.write"
-      ]
-    }
+resource "google_container_node_pool" "primary_nodes" {
+  name     = "${var.cluster_name}-node-pool"
+  location = var.region
+  cluster  = google_container_cluster.primary.name
+  project  = var.project_id
+
+  autoscaling {
+    total_min_node_count = var.total_min_node_count
+    total_max_node_count = var.total_max_node_count
   }
 
-  vertical_pod_autoscaling {
-    enabled = false
+  node_config {
+
+    machine_type = var.machine_type
+    disk_size_gb = var.disk_size_gb
+    disk_type    = var.disk_type
+
+    service_account = google_service_account.gke_sa.email
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
   }
+
+  network_config {
+    enable_private_nodes = true
+  }
+
+  upgrade_settings {
+    max_surge       = 1
+    max_unavailable = 1
+  }
+
 }

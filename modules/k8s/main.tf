@@ -43,13 +43,13 @@ resource "kubernetes_deployment_v1" "mario_v1" {
 
           resources {
             limits = {
-              cpu    = "500m"
-              memory = "1000Mi"
+              cpu               = "500m"
+              memory            = "1000Mi"
               ephemeral-storage = "4Gi"
             }
             requests = {
-              cpu    = "250m"
-              memory = "512Mi"
+              cpu               = "250m"
+              memory            = "512Mi"
               ephemeral-storage = "2Gi"
             }
           }

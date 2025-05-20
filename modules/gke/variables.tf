@@ -42,3 +42,33 @@ variable "public_ip" {
   description = "This host's current Public IP, will be added to the master authorized networks"
   type        = string
 }
+
+variable "total_min_node_count" {
+  description = "Minimum number of all nodes in the node pool"
+  type        = number
+  default     = 1
+}
+
+variable "total_max_node_count" {
+  description = "Maximum number of all nodes in the node pool"
+  type        = number
+  default     = 3
+}
+
+variable "machine_type" {
+  description = "Machine type for the nodes"
+  type        = string
+  default     = "e2-standard-2"
+}
+
+variable "disk_size_gb" {
+  description = "Size of the node's disk in GB"
+  type        = number
+  default     = 100
+}
+
+variable "disk_type" {
+  description = "Type of the node's disk"
+  type        = string
+  default     = "pd-standard"
+}
