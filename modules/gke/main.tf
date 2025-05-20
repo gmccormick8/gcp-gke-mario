@@ -88,7 +88,7 @@ resource "google_container_node_pool" "primary_nodes" {
     service_account = google_service_account.gke_sa.email
     oauth_scopes = [
       "https://www.googleapis.com/auth/monitoring.write",
-      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/logging.write"
     ]
   }
 
