@@ -14,10 +14,16 @@ provider "helm" {
   }
 }
 
+resource "kubernetes_namespace" "mario" {
+  metadata {
+    name = "mario"
+  }
+}
+
 resource "kubernetes_service_account" "mario_sa" {
   metadata {
     name      = "mario-sa"
-    namespace = "mario"
+    namespace = kubernetes_namespace.mario.metadata[0].name
     annotations = {
       "iam.gke.io/gcp-service-account" = google_service_account.mario_gsa.email
     }
@@ -40,8 +46,8 @@ resource "google_service_account_iam_binding" "workload_identity_binding" {
 resource "helm_release" "mario" {
   name             = "mario"
   chart            = "${path.module}/helm/mario"
-  namespace        = "mario"
-  create_namespace = true
+  namespace        = kubernetes_namespace.mario.metadata[0].name
+  create_namespace = false # We're creating it explicitly
 
   set {
     name  = "image.repository"
@@ -53,15 +59,14 @@ resource "helm_release" "mario" {
     value = split(":", var.image)[1]
   }
 
-  set {
-    name  = "autoscaling.minReplicas"
-    value = var.min_replicas
-  }
-
-  set {
-    name  = "autoscaling.maxReplicas"
-    value = var.max_replicas
-  }
+  values = [
+    yamlencode({
+      autoscaling = {
+        minReplicas = var.min_replicas
+        maxReplicas = var.max_replicas
+      }
+    })
+  ]
 
   set {
     name  = "serviceAccount.create"
@@ -73,5 +78,5 @@ resource "helm_release" "mario" {
     value = kubernetes_service_account.mario_sa.metadata[0].name
   }
 
-  depends_on = [kubernetes_service_account.mario_sa]
+  depends_on = [kubernetes_service_account.mario_sa, kubernetes_namespace.mario]
 }
