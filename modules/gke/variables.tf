@@ -52,7 +52,7 @@ variable "min_node_count" {
 variable "max_node_count" {
   description = "Maximum number of nodes in the node pool"
   type        = number
-  default     = 3
+  default     = 2
 }
 
 variable "machine_type" {
@@ -64,7 +64,7 @@ variable "machine_type" {
 variable "disk_size_gb" {
   description = "Size of the node's disk in GB"
   type        = number
-  default     = 100
+  default     = 50
 }
 
 variable "disk_type" {

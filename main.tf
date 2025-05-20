@@ -58,8 +58,8 @@ module "prod-east-cluster" {
   master_ipv4_cidr_block = "172.16.0.0/28"
   public_ip              = var.public_ip
   min_node_count         = 1
-  max_node_count         = 3
-  machine_type           = "e2-standard-4"
+  max_node_count         = 2
+  machine_type           = "e2-standard-2"
   disk_size_gb           = 50
   disk_type              = "pd-standard"
 }
@@ -76,8 +76,8 @@ module "prod-central-cluster" {
   master_ipv4_cidr_block = "172.16.1.0/28"
   public_ip              = var.public_ip
   min_node_count         = 1
-  max_node_count         = 3
-  machine_type           = "e2-standard-4"
+  max_node_count         = 2
+  machine_type           = "e2-standard-2"
   disk_size_gb           = 50
   disk_type              = "pd-standard"
 }
@@ -94,14 +94,15 @@ module "prod-west-cluster" {
   master_ipv4_cidr_block = "172.16.2.0/28"
   public_ip              = var.public_ip
   min_node_count         = 1
-  max_node_count         = 3
-  machine_type           = "e2-standard-4"
+  max_node_count         = 2
+  machine_type           = "e2-standard-2"
   disk_size_gb           = 50
   disk_type              = "pd-standard"
 }
 
 module "k8s-mario" {
   source                 = "./modules/k8s"
+  project_id             = var.project_id
   cluster_name           = module.prod-central-cluster.cluster_name
   cluster_location       = module.prod-central-cluster.cluster_location
   cluster_endpoint       = module.prod-central-cluster.cluster_endpoint

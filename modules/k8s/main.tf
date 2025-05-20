@@ -6,118 +6,72 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
 }
 
-resource "kubernetes_namespace" "mario" {
-  metadata {
-    name = "mario"
+provider "helm" {
+  kubernetes {
+    host                   = "https://${var.cluster_endpoint}"
+    token                  = data.google_client_config.default.access_token
+    cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
   }
 }
 
-resource "kubernetes_deployment_v1" "mario_v1" {
+resource "kubernetes_service_account" "mario_sa" {
   metadata {
-    name      = "mario"
-    namespace = kubernetes_namespace.mario.metadata[0].name
-    labels = {
-      app = "mario"
-    }
-  }
-
-  spec {
-    selector {
-      match_labels = {
-        app = "mario"
-      }
-    }
-
-    template {
-      metadata {
-        labels = {
-          app = "mario"
-        }
-      }
-
-      spec {
-        container {
-          name              = "mario"
-          image             = var.image
-          image_pull_policy = "Always"
-
-          resources {
-            limits = {
-              cpu               = "500m"
-              memory            = "1000Mi"
-              ephemeral-storage = "4Gi"
-            }
-            requests = {
-              cpu               = "250m"
-              memory            = "512Mi"
-              ephemeral-storage = "2Gi"
-            }
-          }
-
-          port {
-            container_port = 80
-          }
-
-          security_context {
-            allow_privilege_escalation = false
-            privileged                 = false
-          }
-
-        }
-      }
+    name      = "mario-sa"
+    namespace = "mario"
+    annotations = {
+      "iam.gke.io/gcp-service-account" = google_service_account.mario_gsa.email
     }
   }
 }
 
-resource "kubernetes_service_v1" "default" {
-  metadata {
-    name      = "mario-service"
-    namespace = kubernetes_namespace.mario.metadata[0].name
-    labels = {
-      app = "mario"
-    }
-  }
-
-  spec {
-    selector = {
-      app = kubernetes_deployment_v1.mario_v1.metadata[0].labels["app"]
-    }
-
-    port {
-      port        = 80
-      target_port = kubernetes_deployment_v1.mario_v1.spec[0].template[0].spec[0].container[0].port[0].container_port
-    }
-
-    type = "LoadBalancer"
-  }
-
+resource "google_service_account" "mario_gsa" {
+  account_id   = "mario-gsa"
+  display_name = "Mario Game Service Account"
 }
 
-resource "kubernetes_horizontal_pod_autoscaler_v2" "hpa" {
-  metadata {
-    name      = "mario-hpa"
-    namespace = kubernetes_namespace.mario.metadata[0].name
-  }
-  spec {
-    min_replicas = var.min_replicas
-    max_replicas = var.max_replicas
+resource "google_service_account_iam_binding" "workload_identity_binding" {
+  service_account_id = google_service_account.mario_gsa.name
+  role               = "roles/iam.workloadIdentityUser"
+  members = [
+    "serviceAccount:${var.project_id}.svc.id.goog[${kubernetes_service_account.mario_sa.metadata[0].namespace}/${kubernetes_service_account.mario_sa.metadata[0].name}]"
+  ]
+}
 
-    scale_target_ref {
-      kind = "Deployment"
-      name = "mario"
-    }
+resource "helm_release" "mario" {
+  name             = "mario"
+  chart            = "${path.module}/helm/mario"
+  namespace        = "mario"
+  create_namespace = true
 
-    metric {
-      type = "Resource"
-
-      resource {
-        name = "cpu"
-        target {
-          type                = "Utilization"
-          average_utilization = 75
-        }
-      }
-    }
+  set {
+    name  = "image.repository"
+    value = split(":", var.image)[0]
   }
 
+  set {
+    name  = "image.tag"
+    value = split(":", var.image)[1]
+  }
+
+  set {
+    name  = "autoscaling.minReplicas"
+    value = var.min_replicas
+  }
+
+  set {
+    name  = "autoscaling.maxReplicas"
+    value = var.max_replicas
+  }
+
+  set {
+    name  = "serviceAccount.create"
+    value = "false"
+  }
+
+  set {
+    name  = "serviceAccount.name"
+    value = kubernetes_service_account.mario_sa.metadata[0].name
+  }
+
+  depends_on = [kubernetes_service_account.mario_sa]
 }

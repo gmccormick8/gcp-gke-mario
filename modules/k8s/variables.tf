@@ -34,3 +34,8 @@ variable "cluster_ca_certificate" {
   description = "The cluster ca certificate (base64 encoded)"
   type        = string
 }
+
+variable "project_id" {
+  description = "The GCP project ID"
+  type        = string
+}
