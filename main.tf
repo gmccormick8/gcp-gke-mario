@@ -43,7 +43,7 @@ module "prod-vpc" {
     }
   }
 
-  cloud_nat_configs = [subnets["prod-east-vpc"].region, subnets["prod-central-vpc"].region, subnets["prod-west-vpc"].region]
+  cloud_nat_configs = [subnets.prod-east-vpc.region, subnets.prod-central-vpc.region, subnets.prod-west-vpc.region]
 }
 
 module "prod-east-cluster" {
