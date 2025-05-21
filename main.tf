@@ -100,7 +100,6 @@ module "prod-west-cluster" {
   disk_type              = "pd-standard"
 }
 
-# Create GKE Fleet feature
 resource "google_gke_hub_feature" "fleet_features" {
   provider = google-beta
   name     = "configmanagement"

@@ -1,6 +1,14 @@
 resource "kubernetes_namespace" "metrics_server" {
   metadata {
     name = "metrics-server"
+    labels = {
+      "app.kubernetes.io/managed-by" = "Terraform"
+      "app.kubernetes.io/name"       = "metrics-server"
+    }
+  }
+
+  lifecycle {
+    prevent_destroy = true
   }
 }
 

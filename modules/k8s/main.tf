@@ -14,16 +14,10 @@ provider "helm" {
   }
 }
 
-resource "kubernetes_namespace" "mario" {
-  metadata {
-    name = "mario"
-  }
-}
-
 resource "kubernetes_service_account" "mario_sa" {
   metadata {
     name      = "mario-sa"
-    namespace = kubernetes_namespace.mario.metadata[0].name
+    namespace = helm_release.mario.namespace
     annotations = {
       "iam.gke.io/gcp-service-account" = google_service_account.mario_gsa.email
     }
@@ -32,7 +26,7 @@ resource "kubernetes_service_account" "mario_sa" {
 
 resource "google_service_account" "mario_gsa" {
   account_id   = "mario-gsa"
-  display_name = "Mario Game Service Account"
+  display_name = "Mario Google Service Account"
 }
 
 resource "google_service_account_iam_binding" "workload_identity_binding" {
@@ -77,5 +71,5 @@ resource "helm_release" "mario" {
     value = kubernetes_service_account.mario_sa.metadata[0].name
   }
 
-  depends_on = [kubernetes_service_account.mario_sa, kubernetes_namespace.mario]
+  depends_on = []
 }
