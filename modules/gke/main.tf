@@ -9,13 +9,13 @@ resource "google_project_iam_member" "gke_sa_node_service_agent_role" {
   member  = "serviceAccount:${google_service_account.gke_sa.email}"
 }
 
-resource "google_project_iam_member" "gke_sa_node_service_agent_role" {
+resource "google_project_iam_member" "gke_sa_network_viewer_role" {
   project = var.project_id
   role    = "roles/compute.networkViewer"
   member  = "serviceAccount:${google_service_account.gke_sa.email}"
 }
 
-resource "google_project_iam_member" "gke_sa_node_service_agent_role" {
+resource "google_project_iam_member" "gke_sa_container_admin_role" {
   project = var.project_id
   role    = "roles/container.admin"
   member  = "serviceAccount:${google_service_account.gke_sa.email}"
