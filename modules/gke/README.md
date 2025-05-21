@@ -12,6 +12,8 @@ This module creates a secure Google Kubernetes Engine (GKE) cluster with private
 - Regular release channel updates
 - Node service account with minimal permissions
 - Gateway API support
+- Fleet membership ready for multi-cluster management
+- Standardized membership ID format for fleet enrollment
 
 ## Required APIs
 
@@ -20,6 +22,8 @@ container.googleapis.com
 compute.googleapis.com
 cloudresourcemanager.googleapis.com
 iam.googleapis.com
+gkehub.googleapis.com
+anthosconfigmanagement.googleapis.com
 ```
 
 ## Usage
@@ -74,13 +78,15 @@ module "gke_cluster" {
 
 ## Outputs
 
-| Name             | Description                              |
-| ---------------- | ---------------------------------------- |
-| cluster_id       | The full ID of the GKE cluster           |
-| cluster_name     | The name of the GKE cluster              |
-| cluster_location | The cluster's location                   |
-| cluster_endpoint | The IP address of the cluster master     |
-| master_auth      | The cluster's authentication information |
+| Name                  | Description                                       |
+| --------------------- | ------------------------------------------------- |
+| cluster_id            | The full ID of the GKE cluster                    |
+| cluster_name          | The name of the GKE cluster                       |
+| cluster_location      | The cluster's location                            |
+| cluster_endpoint      | The IP address of the cluster master              |
+| master_auth           | The cluster's authentication information          |
+| fleet_membership_id   | The ID used for fleet membership registration     |
+| gke_hub_membership_id | The full resource ID for GKE Hub fleet membership |
 
 ## Security Features
 
@@ -108,6 +114,18 @@ The module creates a node pool with:
 - Private nodes
 - Configurable machine type and disk specifications
 - Custom service account with minimal permissions
+
+## Fleet Membership Configuration
+
+The module provides standardized outputs for fleet membership:
+
+- `fleet_membership_id`: Used for registering the cluster with a fleet
+- `gke_hub_membership_id`: Full resource ID path for the cluster's fleet membership
+
+These outputs follow the format:
+
+- Membership ID: `{cluster_name}-membership`
+- Resource ID: `//gkehub.googleapis.com/projects/{project_id}/locations/global/memberships/{cluster_name}-membership`
 
 ## License
 

@@ -17,6 +17,8 @@ api_array=(
   "monitoring.googleapis.com"
   "logging.googleapis.com"
   "containerregistry.googleapis.com"
+  "gkehub.googleapis.com"
+  "anthosconfigmanagement.googleapis.com"
 )
 
 for api in "${api_array[@]}";

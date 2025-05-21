@@ -95,6 +95,11 @@ resource "google_container_node_pool" "primary_nodes" {
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
+
+    shielded_instance_config {
+      enable_secure_boot          = true
+      enable_integrity_monitoring = true
+    }
   }
 
   network_config {
@@ -111,4 +116,20 @@ resource "google_container_node_pool" "primary_nodes" {
     max_unavailable = 1
   }
 
+}
+
+# Fleet Membership
+resource "google_gke_hub_membership" "cluster_membership" {
+  provider      = google-beta
+  membership_id = "${var.cluster_name}-membership"
+  project       = var.project_id
+  location      = "global"
+
+  endpoint {
+    gke_cluster {
+      resource_link = "//container.googleapis.com/${google_container_cluster.primary.id}"
+    }
+  }
+
+  depends_on = [google_container_cluster.primary]
 }

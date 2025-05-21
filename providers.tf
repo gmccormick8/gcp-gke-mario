@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 6.30"
     }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = "~> 6.30"
+    }
     kubernetes = {
       source  = "hashicorp/kubernetes"
       version = "~> 2.30"
@@ -18,5 +22,9 @@ terraform {
 }
 
 provider "google" {
+  project = var.project_id
+}
+
+provider "google-beta" {
   project = var.project_id
 }

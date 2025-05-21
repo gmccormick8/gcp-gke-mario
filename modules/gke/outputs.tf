@@ -25,3 +25,13 @@ output "cluster_endpoint" {
   description = "The IP address of the cluster master"
   value       = google_container_cluster.primary.endpoint
 }
+
+output "fleet_membership_id" {
+  description = "The ID of the fleet membership"
+  value       = google_gke_hub_membership.cluster_membership.membership_id
+}
+
+output "gke_hub_membership_id" {
+  description = "The full resource ID of the cluster's fleet membership"
+  value       = google_gke_hub_membership.cluster_membership.id
+}
