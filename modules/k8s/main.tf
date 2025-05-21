@@ -20,6 +20,7 @@ resource "helm_release" "mario" {
   namespace        = "mario"
   create_namespace = true
 
+  # Override the default values.yaml values.
   values = [
     yamlencode({
       image = {

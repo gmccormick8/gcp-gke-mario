@@ -1,3 +1,4 @@
+# Default values for Mario Helm chart.
 image:
   repository: sevenajay/mario
   tag: latest
