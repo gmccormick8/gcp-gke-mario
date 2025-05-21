@@ -37,4 +37,8 @@ resource "helm_release" "mario" {
       }
     })
   ]
+
+  lifecycle {
+    prevent_destroy = false
+  }
 }

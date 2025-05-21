@@ -130,6 +130,4 @@ resource "google_gke_hub_membership" "cluster_membership" {
       resource_link = "//container.googleapis.com/${google_container_cluster.primary.id}"
     }
   }
-
-  depends_on = [google_container_cluster.primary]
 }
