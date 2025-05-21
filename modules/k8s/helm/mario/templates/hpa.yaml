@@ -16,12 +16,6 @@ spec:
         target:
           type: Utilization
           averageUtilization: { { .Values.autoscaling.cpuUtilization } }
-    - type: Resource
-      resource:
-        name: memory
-        target:
-          type: Utilization
-          averageUtilization: { { .Values.autoscaling.memoryUtilization } }
   behavior:
     scaleUp:
       stabilizationWindowSeconds:
