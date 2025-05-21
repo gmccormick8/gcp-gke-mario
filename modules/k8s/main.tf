@@ -14,29 +14,6 @@ provider "helm" {
   }
 }
 
-resource "kubernetes_service_account" "mario_sa" {
-  metadata {
-    name      = "mario-sa"
-    namespace = helm_release.mario.namespace
-    annotations = {
-      "iam.gke.io/gcp-service-account" = google_service_account.mario_gsa.email
-    }
-  }
-}
-
-resource "google_service_account" "mario_gsa" {
-  account_id   = "mario-gsa"
-  display_name = "Mario Google Service Account"
-}
-
-resource "google_service_account_iam_binding" "workload_identity_binding" {
-  service_account_id = google_service_account.mario_gsa.name
-  role               = "roles/iam.workloadIdentityUser"
-  members = [
-    "serviceAccount:${var.project_id}.svc.id.goog[${kubernetes_service_account.mario_sa.metadata[0].namespace}/${kubernetes_service_account.mario_sa.metadata[0].name}]"
-  ]
-}
-
 resource "helm_release" "mario" {
   name             = "mario"
   chart            = "${path.module}/helm/mario"
@@ -60,16 +37,4 @@ resource "helm_release" "mario" {
       }
     })
   ]
-
-  set {
-    name  = "serviceAccount.create"
-    value = "false"
-  }
-
-  set {
-    name  = "serviceAccount.name"
-    value = kubernetes_service_account.mario_sa.metadata[0].name
-  }
-
-  depends_on = []
 }

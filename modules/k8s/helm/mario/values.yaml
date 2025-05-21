@@ -25,7 +25,3 @@ autoscaling:
   memoryUtilization: 75
   scaleUpStabilization: 60
   scaleDownStabilization: 300
-
-serviceAccount:
-  create: false
-  name: "mario-sa"

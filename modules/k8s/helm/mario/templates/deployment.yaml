@@ -13,7 +13,6 @@ spec:
       labels:
         app: mario
     spec:
-      serviceAccountName: { { .Values.serviceAccount.name } }
       containers:
         - name: mario
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
