@@ -19,8 +19,8 @@ service:
 
 autoscaling:
   enabled: true
-  minReplicas: { { .Values.autoscaling.minReplicas } }
-  maxReplicas: { { .Values.autoscaling.maxReplicas } }
+  minReplicas: 1
+  maxReplicas: 5
   cpuUtilization: 75
   memoryUtilization: 75
   scaleUpStabilization: 60
