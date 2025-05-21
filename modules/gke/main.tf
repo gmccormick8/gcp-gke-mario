@@ -47,10 +47,6 @@ resource "google_container_cluster" "primary" {
     channel = "CHANNEL_STANDARD"
   }
 
-  workload_identity_config {
-    workload_pool = "${var.project_id}.svc.id.goog"
-  }
-
   private_cluster_config {
     enable_private_nodes    = true
     enable_private_endpoint = false
