@@ -19,18 +19,13 @@ resource "helm_release" "mario" {
   chart            = "${path.module}/helm/mario"
   namespace        = "mario"
   create_namespace = true
-  set {
-    name  = "image.repository"
-    value = split(":", var.image)[0]
-  }
-
-  set {
-    name  = "image.tag"
-    value = split(":", var.image)[1]
-  }
 
   values = [
     yamlencode({
+      image = {
+        repository = split(":", var.image)[0]
+        tag        = split(":", var.image)[1]
+      }
       autoscaling = {
         minReplicas = var.min_replicas
         maxReplicas = var.max_replicas
@@ -39,6 +34,10 @@ resource "helm_release" "mario" {
   ]
 
   lifecycle {
+    precondition {
+      condition     = can(regex(":", var.image))
+      error_message = "The image variable must include a tag (format: repository:tag)"
+    }
     prevent_destroy = false
   }
 }
