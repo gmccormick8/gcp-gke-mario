@@ -100,19 +100,6 @@ module "prod-west-cluster" {
   disk_type              = "pd-standard"
 }
 
-resource "google_gke_hub_feature" "fleet_features" {
-  provider = google-beta
-  name     = "configmanagement"
-  project  = var.project_id
-  location = "global"
-
-  depends_on = [
-    module.prod-east-cluster,
-    module.prod-central-cluster,
-    module.prod-west-cluster
-  ]
-}
-
 module "k8s-mario" {
   source                 = "./modules/k8s"
   project_id             = var.project_id
