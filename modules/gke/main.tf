@@ -3,15 +3,21 @@ resource "google_service_account" "gke_sa" {
   display_name = "GKE Service Account for ${var.zone}"
 }
 
-resource "google_project_iam_member" "gke_sa_log_write_role" {
+resource "google_project_iam_member" "gke_sa_node_service_agent_role" {
   project = var.project_id
-  role    = "roles/logging.logWriter"
+  role    = "roles/container.nodeServiceAgent"
   member  = "serviceAccount:${google_service_account.gke_sa.email}"
 }
 
-resource "google_project_iam_member" "gke_sa_metric_write_role" {
+resource "google_project_iam_member" "gke_sa_node_service_agent_role" {
   project = var.project_id
-  role    = "roles/monitoring.metricWriter"
+  role    = "roles/compute.networkViewer"
+  member  = "serviceAccount:${google_service_account.gke_sa.email}"
+}
+
+resource "google_project_iam_member" "gke_sa_node_service_agent_role" {
+  project = var.project_id
+  role    = "roles/container.admin"
   member  = "serviceAccount:${google_service_account.gke_sa.email}"
 }
 
@@ -93,6 +99,11 @@ resource "google_container_node_pool" "primary_nodes" {
 
   network_config {
     enable_private_nodes = true
+  }
+
+  management {
+    auto_upgrade = true
+    auto_repair  = true
   }
 
   upgrade_settings {

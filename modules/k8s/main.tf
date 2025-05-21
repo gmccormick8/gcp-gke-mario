@@ -46,9 +46,8 @@ resource "google_service_account_iam_binding" "workload_identity_binding" {
 resource "helm_release" "mario" {
   name             = "mario"
   chart            = "${path.module}/helm/mario"
-  namespace        = kubernetes_namespace.mario.metadata[0].name
-  create_namespace = false # We're creating it explicitly
-
+  namespace        = "mario"
+  create_namespace = true
   set {
     name  = "image.repository"
     value = split(":", var.image)[0]

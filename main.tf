@@ -58,9 +58,9 @@ module "prod-east-cluster" {
   master_ipv4_cidr_block = "172.16.0.0/28"
   public_ip              = var.public_ip
   min_node_count         = 1
-  max_node_count         = 2
-  machine_type           = "e2-standard-2"
-  disk_size_gb           = 50
+  max_node_count         = 3
+  machine_type           = "e2-small"
+  disk_size_gb           = 25
   disk_type              = "pd-standard"
 }
 
@@ -76,9 +76,9 @@ module "prod-central-cluster" {
   master_ipv4_cidr_block = "172.16.1.0/28"
   public_ip              = var.public_ip
   min_node_count         = 1
-  max_node_count         = 2
-  machine_type           = "e2-standard-2"
-  disk_size_gb           = 50
+  max_node_count         = 3
+  machine_type           = "e2-small"
+  disk_size_gb           = 25
   disk_type              = "pd-standard"
 }
 
@@ -95,8 +95,8 @@ module "prod-west-cluster" {
   public_ip              = var.public_ip
   min_node_count         = 1
   max_node_count         = 2
-  machine_type           = "e2-standard-2"
-  disk_size_gb           = 50
+  machine_type           = "e2-small"
+  disk_size_gb           = 25
   disk_type              = "pd-standard"
 }
 
