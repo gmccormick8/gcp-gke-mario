@@ -32,6 +32,33 @@ provider "kubernetes" {
   cluster_ca_certificate = local.providers["west"].cluster_ca_certificate
 }
 
+provider "helm" {
+  alias = "east"
+  kubernetes {
+    host                   = local.providers["east"].host
+    token                  = local.providers["east"].token
+    cluster_ca_certificate = local.providers["east"].cluster_ca_certificate
+  }
+}
+
+provider "helm" {
+  alias = "central"
+  kubernetes {
+    host                   = local.providers["central"].host
+    token                  = local.providers["central"].token
+    cluster_ca_certificate = local.providers["central"].cluster_ca_certificate
+  }
+}
+
+provider "helm" {
+  alias = "west"
+  kubernetes {
+    host                   = local.providers["west"].host
+    token                  = local.providers["west"].token
+    cluster_ca_certificate = local.providers["west"].cluster_ca_certificate
+  }
+}
+
 # Deploy Gateway API resources
 resource "kubernetes_manifest" "gateway_class" {
   provider = kubernetes.central
@@ -59,9 +86,9 @@ resource "kubernetes_manifest" "gateway" {
     spec = {
       gatewayClassName = "gke-l7-global-external-mc"
       listeners = [{
-        name        = "http"
-        protocol    = "HTTP"
-        port        = 80
+        name     = "http"
+        protocol = "HTTP"
+        port     = 80
         allowedRoutes = {
           namespaces = {
             from = "Same"
@@ -93,8 +120,8 @@ resource "kubernetes_manifest" "http_route" {
             kind      = "Service"
             name      = "mario-service"
             namespace = "mario"
-            port     = 80
-            weight   = 1
+            port      = 80
+            weight    = 1
           }
         ]
       }]
@@ -124,33 +151,5 @@ resource "helm_release" "mario" {
       }
     })
   ]
-
-  provider = helm[each.key]
-}
-
-provider "helm" {
-  alias = "east"
-  kubernetes {
-    host                   = local.providers["east"].host
-    token                  = local.providers["east"].token
-    cluster_ca_certificate = local.providers["east"].cluster_ca_certificate
-  }
-}
-
-provider "helm" {
-  alias = "central"
-  kubernetes {
-    host                   = local.providers["central"].host
-    token                  = local.providers["central"].token
-    cluster_ca_certificate = local.providers["central"].cluster_ca_certificate
-  }
-}
-
-provider "helm" {
-  alias = "west"
-  kubernetes {
-    host                   = local.providers["west"].host
-    token                  = local.providers["west"].token
-    cluster_ca_certificate = local.providers["west"].cluster_ca_certificate
-  }
+  provider = each.key == "east" ? helm.east : (each.key == "central" ? helm.central : helm.west)
 }
