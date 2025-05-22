@@ -59,9 +59,31 @@ provider "helm" {
   }
 }
 
+# Wait for cluster resources to be ready
+resource "time_sleep" "wait_for_clusters" {
+  depends_on = [
+    helm_release.mario_east,
+    helm_release.mario_central,
+    helm_release.mario_west
+  ]
+
+  create_duration = "10m"
+}
+
+resource "kubernetes_namespace" "mario" {
+  provider   = kubernetes.central
+  depends_on = [time_sleep.wait_for_clusters]
+
+  metadata {
+    name = "mario"
+  }
+}
+
 # Deploy Gateway API resources
 resource "kubernetes_manifest" "gateway_class" {
-  provider = kubernetes.central
+  provider   = kubernetes.central
+  depends_on = [kubernetes_namespace.mario]
+
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1beta1"
     kind       = "GatewayClass"
@@ -75,7 +97,9 @@ resource "kubernetes_manifest" "gateway_class" {
 }
 
 resource "kubernetes_manifest" "gateway" {
-  provider = kubernetes.central
+  provider   = kubernetes.central
+  depends_on = [kubernetes_manifest.gateway_class]
+
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1beta1"
     kind       = "Gateway"
@@ -97,15 +121,12 @@ resource "kubernetes_manifest" "gateway" {
       }]
     }
   }
-  depends_on = [
-    helm_release.mario_east,
-    helm_release.mario_central,
-    helm_release.mario_west
-  ]
 }
 
 resource "kubernetes_manifest" "http_route" {
-  provider = kubernetes.central
+  provider   = kubernetes.central
+  depends_on = [kubernetes_manifest.gateway]
+
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1beta1"
     kind       = "HTTPRoute"
@@ -131,7 +152,6 @@ resource "kubernetes_manifest" "http_route" {
       }]
     }
   }
-  depends_on = [kubernetes_manifest.gateway]
 }
 
 # Deploy Mario to each cluster
