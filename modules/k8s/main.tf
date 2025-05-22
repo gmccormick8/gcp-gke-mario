@@ -155,10 +155,4 @@ resource "helm_release" "mario" {
       }
     })
   ]
-
-  depends_on = [
-    kubernetes_manifest.gateway_class,
-    kubernetes_manifest.gateway,
-    kubernetes_manifest.http_route
-  ]
 }
