@@ -97,7 +97,11 @@ resource "kubernetes_manifest" "gateway" {
       }]
     }
   }
-  depends_on = [helm_release.mario]
+  depends_on = [
+    helm_release.mario_east,
+    helm_release.mario_central,
+    helm_release.mario_west
+  ]
 }
 
 resource "kubernetes_manifest" "http_route" {
@@ -131,12 +135,8 @@ resource "kubernetes_manifest" "http_route" {
 }
 
 # Deploy Mario to each cluster
-resource "helm_release" "mario" {
-  for_each = {
-    east    = helm.east
-    central = helm.central
-    west    = helm.west
-  }
+resource "helm_release" "mario_east" {
+  provider = helm.east
 
   name             = "mario"
   chart            = "${path.module}/helm/mario"
@@ -155,6 +155,48 @@ resource "helm_release" "mario" {
       }
     })
   ]
+}
 
-  depends_on = [helm.east, helm.central, helm.west]
+resource "helm_release" "mario_central" {
+  provider = helm.central
+
+  name             = "mario"
+  chart            = "${path.module}/helm/mario"
+  namespace        = "mario"
+  create_namespace = true
+
+  values = [
+    yamlencode({
+      image = {
+        repository = split(":", var.image)[0]
+        tag        = split(":", var.image)[1]
+      }
+      autoscaling = {
+        minReplicas = var.min_replicas
+        maxReplicas = var.max_replicas
+      }
+    })
+  ]
+}
+
+resource "helm_release" "mario_west" {
+  provider = helm.west
+
+  name             = "mario"
+  chart            = "${path.module}/helm/mario"
+  namespace        = "mario"
+  create_namespace = true
+
+  values = [
+    yamlencode({
+      image = {
+        repository = split(":", var.image)[0]
+        tag        = split(":", var.image)[1]
+      }
+      autoscaling = {
+        minReplicas = var.min_replicas
+        maxReplicas = var.max_replicas
+      }
+    })
+  ]
 }
