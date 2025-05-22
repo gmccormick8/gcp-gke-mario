@@ -101,13 +101,29 @@ module "prod-west-cluster" {
 }
 
 module "k8s-mario" {
-  source                 = "./modules/k8s"
-  project_id             = var.project_id
-  cluster_name           = module.prod-central-cluster.cluster_name
-  cluster_location       = module.prod-central-cluster.cluster_location
-  cluster_endpoint       = module.prod-central-cluster.cluster_endpoint
-  cluster_ca_certificate = module.prod-central-cluster.master_auth.cluster_ca_certificate
-  min_replicas           = 1
-  max_replicas           = 5
-  image                  = "sevenajay/mario:latest"
+  source     = "./modules/k8s"
+  project_id = var.project_id
+  clusters = {
+    east = {
+      name     = module.prod-east-cluster.cluster_name
+      location = module.prod-east-cluster.cluster_location
+      endpoint = module.prod-east-cluster.cluster_endpoint
+      ca_cert  = module.prod-east-cluster.master_auth.cluster_ca_certificate
+    }
+    central = {
+      name     = module.prod-central-cluster.cluster_name
+      location = module.prod-central-cluster.cluster_location
+      endpoint = module.prod-central-cluster.cluster_endpoint
+      ca_cert  = module.prod-central-cluster.master_auth.cluster_ca_certificate
+    }
+    west = {
+      name     = module.prod-west-cluster.cluster_name
+      location = module.prod-west-cluster.cluster_location
+      endpoint = module.prod-west-cluster.cluster_endpoint
+      ca_cert  = module.prod-west-cluster.master_auth.cluster_ca_certificate
+    }
+  }
+  min_replicas = 1
+  max_replicas = 5
+  image        = "sevenajay/mario:latest"
 }

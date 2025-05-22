@@ -1,13 +1,3 @@
-variable "cluster_name" {
-  description = "The name of the cluster."
-  type        = string
-}
-
-variable "cluster_location" {
-  description = "The location of the cluster."
-  type        = string
-}
-
 variable "image" {
   description = "The Docker image to use for the deployment."
   type        = string
@@ -25,17 +15,17 @@ variable "max_replicas" {
   default     = 5
 }
 
-variable "cluster_endpoint" {
-  description = "The cluster endpoint"
-  type        = string
-}
-
-variable "cluster_ca_certificate" {
-  description = "The cluster ca certificate (base64 encoded)"
-  type        = string
-}
-
 variable "project_id" {
   description = "The GCP project ID"
   type        = string
+}
+
+variable "clusters" {
+  description = "Map of cluster configurations"
+  type = map(object({
+    name     = string
+    location = string
+    endpoint = string
+    ca_cert  = string
+  }))
 }

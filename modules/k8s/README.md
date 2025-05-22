@@ -1,27 +1,23 @@
-# Kubernetes Module for Mario Application
+# Kubernetes Multi-Cluster Module for Mario Application
 
-This module deploys the Super Mario game on a GKE cluster using Helm. It includes configurations for auto-scaling, resource management, and load balancing.
+This module deploys the Super Mario game across multiple GKE clusters using Gateway API for global load balancing.
 
 ## Features
 
-- Helm-based deployment
+- Multi-cluster deployment with Gateway API
+- Global load balancing across regions
+- Automated failover and traffic distribution
+- Helm-based deployment in each cluster
 - Horizontal Pod Autoscaling (HPA)
-- Load Balancer service type
 - Resource limits and requests
-- Readiness probes
-- Container security context
-- Configurable image and replica count
 
 ## Prerequisites
 
-- GKE Cluster with Gateway API enabled
+- Multiple GKE Clusters with Gateway API enabled
+- Fleet registration enabled (requires gkehub.googleapis.com)
 - Helm 3.x
 - kubectl configured with cluster access
-- Required GCP APIs enabled:
-  - container.googleapis.com
-  - containerregistry.googleapis.com
-  - compute.googleapis.com
-  - iam.googleapis.com
+- Compute Engine API enabled (compute.googleapis.com)
 
 ## Usage
 
@@ -29,29 +25,42 @@ This module deploys the Super Mario game on a GKE cluster using Helm. It include
 module "k8s_mario" {
   source = "./modules/k8s"
 
-  project_id             = "my-project-id"
-  cluster_name          = "my-cluster"
-  cluster_location      = "us-central1-a"
-  cluster_endpoint      = "cluster-endpoint"
-  cluster_ca_certificate = "base64-encoded-ca-cert"
-  image                 = "sevenajay/mario:latest"
-  min_replicas          = 1
-  max_replicas          = 5
+  project_id = "my-project-id"
+  clusters = {
+    east = {
+      name     = "east-cluster"
+      location = "us-east5-c"
+      endpoint = "cluster-endpoint"
+      ca_cert  = "base64-encoded-ca-cert"
+    }
+    central = {
+      name     = "central-cluster"
+      location = "us-central1-c"
+      endpoint = "cluster-endpoint"
+      ca_cert  = "base64-encoded-ca-cert"
+    }
+    west = {
+      name     = "west-cluster"
+      location = "us-west4-c"
+      endpoint = "cluster-endpoint"
+      ca_cert  = "base64-encoded-ca-cert"
+    }
+  }
+  image        = "sevenajay/mario:latest"
+  min_replicas = 1
+  max_replicas = 5
 }
 ```
 
 ## Module Variables
 
-| Name                   | Description                                     | Type   | Default | Required |
-| ---------------------- | ----------------------------------------------- | ------ | ------- | :------: |
-| project_id             | GCP Project ID                                  | string | -       |   yes    |
-| cluster_name           | Name of the GKE cluster                         | string | -       |   yes    |
-| cluster_location       | Location of the GKE cluster                     | string | -       |   yes    |
-| cluster_endpoint       | Cluster API endpoint                            | string | -       |   yes    |
-| cluster_ca_certificate | Cluster CA certificate (base64 encoded)         | string | -       |   yes    |
-| image                  | Docker image for Mario (format: repository:tag) | string | -       |   yes    |
-| min_replicas           | Minimum number of pod replicas                  | number | 1       |    no    |
-| max_replicas           | Maximum number of pod replicas                  | number | 5       |    no    |
+| Name         | Description                                     | Type        | Required |
+| ------------ | ----------------------------------------------- | ----------- | :------: |
+| project_id   | GCP Project ID                                  | string      |   yes    |
+| clusters     | Map of cluster configurations                   | map(object) |   yes    |
+| image        | Docker image for Mario (format: repository:tag) | string      |   yes    |
+| min_replicas | Minimum number of pod replicas per cluster      | number      |    no    |
+| max_replicas | Maximum number of pod replicas per cluster      | number      |    no    |
 
 ## Helm Chart Configuration
 
@@ -80,11 +89,21 @@ autoscaling:
   scaleDownStabilization: 300
 ```
 
+## Gateway API Configuration
+
+The module configures:
+
+- GatewayClass for global load balancing
+- Gateway for HTTP traffic
+- HTTPRoute for traffic distribution across clusters
+- Automatic health checking and failover
+- Intelligent traffic routing based on user location
+
 ## Outputs
 
-| Name             | Description                              |
-| ---------------- | ---------------------------------------- |
-| load_balancer_ip | External IP address of the load balancer |
+| Name             | Description                                     |
+| ---------------- | ----------------------------------------------- |
+| load_balancer_ip | Global IP address for accessing the application |
 
 ## Security Features
 

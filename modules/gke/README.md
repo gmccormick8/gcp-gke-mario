@@ -18,12 +18,10 @@ This module creates a secure Google Kubernetes Engine (GKE) cluster with private
 ## Required APIs
 
 ```bash
-container.googleapis.com
 compute.googleapis.com
-cloudresourcemanager.googleapis.com
+container.googleapis.com
 iam.googleapis.com
 gkehub.googleapis.com
-anthosconfigmanagement.googleapis.com
 ```
 
 ## Usage

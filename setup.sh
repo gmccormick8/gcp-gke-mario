@@ -11,14 +11,8 @@ echo -e 'project_id = "'"$DEVSHELL_PROJECT_ID"'"\npublic_ip = "'"$(curl -s ifcon
 api_array=(
   "compute.googleapis.com"
   "container.googleapis.com"
-  "cloudresourcemanager.googleapis.com"
   "iam.googleapis.com"
-  "serviceusage.googleapis.com"
-  "monitoring.googleapis.com"
-  "logging.googleapis.com"
-  "containerregistry.googleapis.com"
   "gkehub.googleapis.com"
-  "anthosconfigmanagement.googleapis.com"
 )
 
 for api in "${api_array[@]}";
