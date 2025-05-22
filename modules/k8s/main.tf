@@ -151,5 +151,9 @@ resource "helm_release" "mario" {
       }
     })
   ]
-  provider = each.key == "east" ? helm.east : (each.key == "central" ? helm.central : helm.west)
+  provider = lookup({
+    east    = helm.east
+    central = helm.central
+    west    = helm.west
+  }, each.key)
 }
