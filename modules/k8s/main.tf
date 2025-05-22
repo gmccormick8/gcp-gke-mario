@@ -152,8 +152,8 @@ resource "helm_release" "mario" {
     })
   ]
 
-  provider = "helm.${each.key}"
-
+  provider = helm.each.key
+  
   depends_on = [
     kubernetes_manifest.gateway_class,
     kubernetes_manifest.gateway,
