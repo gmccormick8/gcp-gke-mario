@@ -132,7 +132,11 @@ resource "kubernetes_manifest" "http_route" {
 
 # Deploy Mario to each cluster
 resource "helm_release" "mario" {
-  for_each = var.clusters
+  for_each = {
+    east    = helm.east
+    central = helm.central
+    west    = helm.west
+  }
 
   name             = "mario"
   chart            = "${path.module}/helm/mario"
@@ -152,8 +156,6 @@ resource "helm_release" "mario" {
     })
   ]
 
-  provider = helm.each.key
-  
   depends_on = [
     kubernetes_manifest.gateway_class,
     kubernetes_manifest.gateway,
