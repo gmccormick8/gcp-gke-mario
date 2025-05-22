@@ -9,6 +9,7 @@ locals {
       cluster_ca_certificate = base64decode(v.ca_cert)
     }
   }
+  depends_on = [data.google_client_config.default]
 }
 
 provider "kubernetes" {
