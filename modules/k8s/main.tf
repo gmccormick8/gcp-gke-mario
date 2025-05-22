@@ -70,25 +70,23 @@ resource "time_sleep" "wait_for_clusters" {
   create_duration = "10m"
 }
 
-resource "kubernetes_namespace" "mario" {
-  provider   = kubernetes.central
-  depends_on = [time_sleep.wait_for_clusters]
-
-  metadata {
-    name = "mario"
-  }
-}
-
 # Deploy Gateway API resources
 resource "kubernetes_manifest" "gateway_class" {
-  provider   = kubernetes.central
-  depends_on = [kubernetes_namespace.mario]
+  provider = kubernetes.central
+  depends_on = [
+    helm_release.mario_east,
+    helm_release.mario_central,
+    helm_release.mario_west
+  ]
 
   manifest = {
     apiVersion = "gateway.networking.k8s.io/v1beta1"
     kind       = "GatewayClass"
     metadata = {
-      name = "gke-l7-global-external-mc"
+      name = "gke-l7-global-mc-gatewayclass"
+      annotations = {
+        "networking.gke.io/default-gateway-class" = "true"
+      }
     }
     spec = {
       controllerName = "gke.io/gateway-controller"
@@ -106,14 +104,21 @@ resource "kubernetes_manifest" "gateway" {
     metadata = {
       name      = "mario-gateway"
       namespace = "mario"
+      annotations = {
+        "networking.gke.io/certmap"             = ""
+        "networking.gke.io/force-http-to-https" = "false"
+      }
     }
     spec = {
-      gatewayClassName = "gke-l7-global-external-mc"
+      gatewayClassName = "gke-l7-global-mc-gatewayclass"
       listeners = [{
         name     = "http"
         protocol = "HTTP"
         port     = 80
         allowedRoutes = {
+          kinds = [{
+            kind = "HTTPRoute"
+          }]
           namespaces = {
             from = "Same"
           }
@@ -133,16 +138,24 @@ resource "kubernetes_manifest" "http_route" {
     metadata = {
       name      = "mario-route"
       namespace = "mario"
+      labels = {
+        "gateway" = "mario-gateway"
+      }
     }
     spec = {
       parentRefs = [{
-        name = "mario-gateway"
+        name      = "mario-gateway"
+        namespace = "mario"
       }]
       rules = [{
+        matches = [{
+          path = {
+            type  = "PathPrefix"
+            value = "/"
+          }
+        }]
         backendRefs = [
           for cluster in var.clusters : {
-            group     = ""
-            kind      = "Service"
             name      = "mario-service"
             namespace = "mario"
             port      = 80

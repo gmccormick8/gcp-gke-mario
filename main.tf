@@ -100,6 +100,19 @@ module "prod-west-cluster" {
   disk_type              = "pd-standard"
 }
 
+# Create fleet host project
+resource "google_gke_hub_feature" "gateway" {
+  name     = "gateway"
+  project  = var.project_id
+  location = "global"
+}
+
+resource "google_gke_hub_feature" "mcs" {
+  name     = "multiclusterservicediscovery"
+  project  = var.project_id
+  location = "global"
+}
+
 module "k8s-mario" {
   source     = "./modules/k8s"
   project_id = var.project_id
@@ -126,4 +139,5 @@ module "k8s-mario" {
   min_replicas = 1
   max_replicas = 5
   image        = "sevenajay/mario:latest"
+  depends_on   = [google_gke_hub_feature.gateway, google_gke_hub_feature.mcs]
 }
