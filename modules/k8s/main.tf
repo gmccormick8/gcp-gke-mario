@@ -155,4 +155,6 @@ resource "helm_release" "mario" {
       }
     })
   ]
+
+  depends_on = [helm.east, helm.central, helm.west]
 }
