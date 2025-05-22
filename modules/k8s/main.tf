@@ -151,9 +151,12 @@ resource "helm_release" "mario" {
       }
     })
   ]
-  provider = lookup({
-    east    = helm.east
-    central = helm.central
-    west    = helm.west
-  }, each.key)
+
+  provider = "helm.${each.key}"
+
+  depends_on = [
+    kubernetes_manifest.gateway_class,
+    kubernetes_manifest.gateway,
+    kubernetes_manifest.http_route
+  ]
 }
