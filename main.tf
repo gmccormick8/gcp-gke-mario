@@ -139,5 +139,4 @@ module "k8s-mario" {
   min_replicas = 1
   max_replicas = 5
   image        = "sevenajay/mario:latest"
-  depends_on   = [google_gke_hub_feature.gateway, google_gke_hub_feature.mcs]
-}
+ }
