@@ -20,12 +20,22 @@ variable "project_id" {
   type        = string
 }
 
-variable "clusters" {
-  description = "Map of cluster configurations"
-  type = map(object({
-    name     = string
-    location = string
-    endpoint = string
-    ca_cert  = string
-  }))
+variable "cluster_name" {
+  description = "The name of the cluster"
+  type        = string
+}
+
+variable "cluster_location" {
+  description = "The location of the cluster"
+  type        = string
+}
+
+variable "cluster_endpoint" {
+  description = "The endpoint of the cluster"
+  type        = string
+}
+
+variable "cluster_ca_cert" {
+  description = "The CA certificate of the cluster"
+  type        = string
 }

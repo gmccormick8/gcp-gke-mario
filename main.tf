@@ -113,30 +113,61 @@ resource "google_gke_hub_feature" "mcs" {
   location = "global"
 }
 
-module "k8s-mario" {
-  source     = "./modules/k8s"
-  project_id = var.project_id
-  clusters = {
-    east = {
-      name     = module.prod-east-cluster.cluster_name
-      location = module.prod-east-cluster.cluster_location
-      endpoint = module.prod-east-cluster.cluster_endpoint
-      ca_cert  = module.prod-east-cluster.master_auth.cluster_ca_certificate
+module "k8s-mario-east" {
+  source           = "./modules/k8s"
+  project_id       = var.project_id
+  cluster_name     = module.prod-east-cluster.cluster_name
+  cluster_location = module.prod-east-cluster.cluster_location
+  cluster_endpoint = module.prod-east-cluster.cluster_endpoint
+  cluster_ca_cert  = module.prod-east-cluster.master_auth.cluster_ca_certificate
+  min_replicas     = 1
+  max_replicas     = 5
+  image            = "sevenajay/mario:latest"
+}
+
+module "k8s-mario-central" {
+  source           = "./modules/k8s"
+  project_id       = var.project_id
+  cluster_name     = module.prod-central-cluster.cluster_name
+  cluster_location = module.prod-central-cluster.cluster_location
+  cluster_endpoint = module.prod-central-cluster.cluster_endpoint
+  cluster_ca_cert  = module.prod-central-cluster.master_auth.cluster_ca_certificate
+  min_replicas     = 1
+  max_replicas     = 5
+  image            = "sevenajay/mario:latest"
+}
+
+module "k8s-mario-west" {
+  source           = "./modules/k8s"
+  project_id       = var.project_id
+  cluster_name     = module.prod-west-cluster.cluster_name
+  cluster_location = module.prod-west-cluster.cluster_location
+  cluster_endpoint = module.prod-west-cluster.cluster_endpoint
+  cluster_ca_cert  = module.prod-west-cluster.master_auth.cluster_ca_certificate
+  min_replicas     = 1
+  max_replicas     = 5
+  image            = "sevenajay/mario:latest"
+}
+
+# Configure Gateway API resources
+resource "kubernetes_manifest" "gateway_class" {
+  provider = kubernetes
+  manifest = {
+    apiVersion = "gateway.networking.k8s.io/v1beta1"
+    kind       = "GatewayClass"
+    metadata = {
+      name = "gke-l7-global-mc-gatewayclass"
+      annotations = {
+        "networking.gke.io/default-gateway-class" = "true"
+      }
     }
-    central = {
-      name     = module.prod-central-cluster.cluster_name
-      location = module.prod-central-cluster.cluster_location
-      endpoint = module.prod-central-cluster.cluster_endpoint
-      ca_cert  = module.prod-central-cluster.master_auth.cluster_ca_certificate
-    }
-    west = {
-      name     = module.prod-west-cluster.cluster_name
-      location = module.prod-west-cluster.cluster_location
-      endpoint = module.prod-west-cluster.cluster_endpoint
-      ca_cert  = module.prod-west-cluster.master_auth.cluster_ca_certificate
+    spec = {
+      controllerName = "gke.io/gateway-controller"
     }
   }
-  min_replicas = 1
-  max_replicas = 5
-  image        = "sevenajay/mario:latest"
- }
+  depends_on = [
+    module.k8s-mario-east,
+    module.k8s-mario-central,
+    module.k8s-mario-west
+  ]
+}
