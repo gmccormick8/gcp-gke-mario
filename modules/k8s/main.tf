@@ -15,8 +15,8 @@ provider "helm" {
 }
 
 # Deploy Mario to cluster
-resource "helm_release" "mario1" {
-  name             = "mario1"
+resource "helm_release" "mario" {
+  name             = "mario"
   chart            = "${path.module}/helm/mario"
   namespace        = "mario"
   create_namespace = true
