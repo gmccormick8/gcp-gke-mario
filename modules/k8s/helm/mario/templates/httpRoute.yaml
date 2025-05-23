@@ -1,0 +1,20 @@
+{{- $gateway := .Values.gateway }}
+{{- if eq $gateway.configcluster .Values.clusterName }}
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: http-route
+  labels:
+    app: {{ $serviceName }}
+    gateway: multi-cluster-gateway
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: http-external-gateway
+  rules:
+  - backendRefs:
+    - group: net.gke.io
+      kind: ServiceImport
+      name: mario-service
+      port: 80
+{{- end -}}
