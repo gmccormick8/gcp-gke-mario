@@ -100,13 +100,6 @@ module "prod-west-cluster" {
   disk_type              = "pd-standard"
 }
 
-# Create fleet host project
-resource "google_gke_hub_feature" "gateway" {
-  name     = "gateway"
-  project  = var.project_id
-  location = "global"
-}
-
 resource "google_gke_hub_feature" "mcs" {
   name     = "multiclusterservicediscovery"
   project  = var.project_id
@@ -118,6 +111,12 @@ resource "google_gke_hub_feature" "mci" {
   name     = "multiclusteringress"
   project  = var.project_id
   location = "global"
+
+  spec {
+    multiclusteringress {
+      config_membership = module.prod-central-cluster.fleet_membership_id
+    }
+  }
 }
 
 # Configure the central cluster as the MCI configuration cluster

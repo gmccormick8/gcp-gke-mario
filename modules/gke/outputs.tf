@@ -28,10 +28,5 @@ output "cluster_endpoint" {
 
 output "fleet_membership_id" {
   description = "The ID of the fleet membership"
-  value       = var.cluster_name
-}
-
-output "gke_hub_membership_id" {
-  description = "The full resource ID of the cluster's fleet membership"
-  value       = google_gke_hub_membership.cluster_membership.id
+  value       = google_container_cluster.primary.fleet[0].project
 }
