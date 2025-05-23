@@ -1,6 +1,4 @@
-apiVersion: multicluster.x-k8s.io/v1alpha1
+apiVersion: net.gke.io/v1
 kind: ServiceExport
 metadata:
-  name: {{ .Release.Name }}-mario
-  namespace: {{ .Release.Namespace }}
-spec: {}
+  name: mario-service

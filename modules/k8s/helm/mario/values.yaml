@@ -15,7 +15,6 @@ resources:
     ephemeral-storage: 2Gi
 
 service:
-  type: LoadBalancer
   port: 80
 
 autoscaling:
