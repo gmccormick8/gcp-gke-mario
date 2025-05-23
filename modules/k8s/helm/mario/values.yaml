@@ -2,7 +2,7 @@
 image:
   repository: sevenajay/mario
   tag: latest
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 resources:
   limits:
