@@ -5,7 +5,7 @@ apiVersion: gateway.networking.k8s.io/v1beta1
 metadata:
   name: http-route
   labels:
-    app: {{ $serviceName }}
+    app: mario-service
     gateway: multi-cluster-gateway
 spec:
   parentRefs:
