@@ -134,5 +134,5 @@ resource "google_gke_hub_membership" "cluster_membership" {
     }
   }
 
-  depends_on = [google_container_node_pool.primary_nodes]
+  depends_on = [google_container_cluster.primary]
 }

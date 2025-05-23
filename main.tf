@@ -94,7 +94,7 @@ module "prod-west-cluster" {
   master_ipv4_cidr_block = "172.16.2.0/28"
   public_ip              = var.public_ip
   min_node_count         = 1
-  max_node_count         = 2
+  max_node_count         = 3
   machine_type           = "e2-small"
   disk_size_gb           = 25
   disk_type              = "pd-standard"
@@ -111,6 +111,27 @@ resource "google_gke_hub_feature" "mcs" {
   name     = "multiclusterservicediscovery"
   project  = var.project_id
   location = "global"
+}
+
+# Enable Multi-Cluster Ingress feature
+resource "google_gke_hub_feature" "mci" {
+  name     = "multiclusteringress"
+  project  = var.project_id
+  location = "global"
+}
+
+# Configure the central cluster as the MCI configuration cluster
+resource "google_gke_hub_feature_membership" "mci_config" {
+  project    = var.project_id
+  location   = "global"
+  feature    = google_gke_hub_feature.mci.name
+  membership = module.prod-central-cluster.fleet_membership_id
+
+  provider = google-beta
+  depends_on = [
+    google_gke_hub_feature.mci,
+    module.prod-central-cluster
+  ]
 }
 
 module "k8s-mario-east" {
