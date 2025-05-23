@@ -1,6 +1,6 @@
 output "load_balancer_ip" {
-  description = "The IP address of the load balancer (only available when gateway is enabled)"
-  value       = var.extra_values.gateway.enabled ? data.kubernetes_service.gateway_ip[0].status[0].load_balancer[0].ingress[0].ip : null
+  description = "The IP address of the load balancer"
+  value       = data.kubernetes_service.gateway_ip[0].status[0].load_balancer[0].ingress[0].ip
 }
 
 data "kubernetes_service" "gateway_ip" {
