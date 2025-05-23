@@ -28,3 +28,5 @@ autoscaling:
 
 gateway:
   configcluster: central-cluster
+
+serviceName: mario-service
