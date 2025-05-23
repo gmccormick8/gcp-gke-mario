@@ -124,9 +124,9 @@ resource "google_container_node_pool" "primary_nodes" {
 
 resource "google_gke_hub_membership" "cluster_membership" {
   provider      = google-beta
-  membership_id = "${var.cluster_name}-membership"
+  membership_id = var.cluster_name
   project       = var.project_id
-  location      = "global"
+  location      = split("-", var.zone)[0]
 
   endpoint {
     gke_cluster {

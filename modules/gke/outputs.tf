@@ -28,7 +28,7 @@ output "cluster_endpoint" {
 
 output "fleet_membership_id" {
   description = "The ID of the fleet membership"
-  value       = google_gke_hub_membership.cluster_membership.membership_id
+  value       = var.cluster_name
 }
 
 output "gke_hub_membership_id" {

@@ -13,6 +13,9 @@ api_array=(
   "container.googleapis.com"
   "iam.googleapis.com"
   "gkehub.googleapis.com"
+  "trafficdirector.googleapis.com"
+  "multiclusterservicediscovery.googleapis.com"
+  "multiclusteringress.googleapis.com"
 )
 
 for api in "${api_array[@]}";
