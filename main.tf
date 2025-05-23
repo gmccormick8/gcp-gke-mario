@@ -148,26 +148,3 @@ module "k8s-mario-west" {
   max_replicas     = 5
   image            = "sevenajay/mario:latest"
 }
-
-# Configure Gateway API resources
-resource "kubernetes_manifest" "gateway_class" {
-  provider = kubernetes
-  manifest = {
-    apiVersion = "gateway.networking.k8s.io/v1beta1"
-    kind       = "GatewayClass"
-    metadata = {
-      name = "gke-l7-global-mc-gatewayclass"
-      annotations = {
-        "networking.gke.io/default-gateway-class" = "true"
-      }
-    }
-    spec = {
-      controllerName = "gke.io/gateway-controller"
-    }
-  }
-  depends_on = [
-    module.k8s-mario-east,
-    module.k8s-mario-central,
-    module.k8s-mario-west
-  ]
-}
