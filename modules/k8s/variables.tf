@@ -39,9 +39,3 @@ variable "cluster_ca_cert" {
   description = "The CA certificate of the cluster"
   type        = string
 }
-
-variable "extra_values" {
-  description = "Extra values to pass to the Helm chart"
-  type        = map(any)
-  default     = {}
-}

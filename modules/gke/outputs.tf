@@ -28,5 +28,5 @@ output "cluster_endpoint" {
 
 output "fleet_membership_id" {
   description = "The ID of the fleet membership"
-  value       = google_container_cluster.primary.fleet.0.membership
+  value       = google_container_cluster.primary.fleet[0].membership
 }
