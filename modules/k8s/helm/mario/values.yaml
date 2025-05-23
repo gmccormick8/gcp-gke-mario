@@ -18,6 +18,9 @@ service:
   type: LoadBalancer
   port: 80
 
+gateway:
+  enabled: false # Will be enabled only for central cluster
+
 autoscaling:
   enabled: true
   minReplicas: 1

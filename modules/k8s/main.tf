@@ -22,7 +22,7 @@ resource "helm_release" "mario" {
   create_namespace = true
 
   values = [
-    yamlencode({
+    yamlencode(merge({
       image = {
         repository = split(":", var.image)[0]
         tag        = split(":", var.image)[1]
@@ -31,6 +31,6 @@ resource "helm_release" "mario" {
         minReplicas = var.min_replicas
         maxReplicas = var.max_replicas
       }
-    })
+    }, var.extra_values))
   ]
 }

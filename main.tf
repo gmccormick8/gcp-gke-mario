@@ -156,6 +156,12 @@ module "k8s-mario-central" {
   min_replicas     = 1
   max_replicas     = 5
   image            = "sevenajay/mario:latest"
+
+  extra_values = {
+    gateway = {
+      enabled = true
+    }
+  }
 }
 
 module "k8s-mario-west" {
