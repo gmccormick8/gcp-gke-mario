@@ -76,11 +76,6 @@ resource "google_container_cluster" "primary" {
   release_channel {
     channel = "REGULAR"
   }
-
-  provisioner "local-exec" {
-    when    = "destroy"
-    command = "sleep 90"
-  }
 }
 
 resource "google_container_node_pool" "primary_nodes" {

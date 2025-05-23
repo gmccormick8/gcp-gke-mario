@@ -25,8 +25,3 @@ output "cluster_endpoint" {
   description = "The IP address of the cluster master"
   value       = google_container_cluster.primary.endpoint
 }
-
-output "fleet_membership_id" {
-  description = "The ID of the fleet membership"
-  value       = google_container_cluster.primary.fleet[0].membership
-}

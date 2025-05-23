@@ -1,4 +1,5 @@
-{{- if eq .Release.Namespace "mario" }}
+{{- $gateway := .Values.gateway }}
+{{- if eq $gateway.configcluster .Values.clusterName }}
 kind: Gateway
 apiVersion: gateway.networking.k8s.io/v1beta1
 metadata:
