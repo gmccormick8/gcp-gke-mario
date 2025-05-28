@@ -16,6 +16,7 @@ api_array=(
   "trafficdirector.googleapis.com"
   "multiclusterservicediscovery.googleapis.com"
   "multiclusteringress.googleapis.com"
+  "anthos.googleapis.com"
 )
 
 for api in "${api_array[@]}";
