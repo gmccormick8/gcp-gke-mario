@@ -31,6 +31,9 @@ resource "helm_release" "mario" {
         minReplicas = var.min_replicas
         maxReplicas = var.max_replicas
       }
+      gateway = {
+        enable = var.config_cluster
+      }
     })
   ]
 }

@@ -39,3 +39,8 @@ variable "cluster_ca_cert" {
   description = "The CA certificate of the cluster"
   type        = string
 }
+
+variable "config_cluster" {
+  description = "Set to true to enable gateway and HTTP Route configuration on this cluster"
+  type        = bool
+}

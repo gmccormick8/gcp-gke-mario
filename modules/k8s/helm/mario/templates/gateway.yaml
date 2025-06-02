@@ -1,4 +1,4 @@
-{{- if (eq .Values.gateway.configcluster .Release.Name) }}
+{{- if .values.gateway.enable }}
 kind: Gateway
 apiVersion: gateway.networking.k8s.io/v1beta1
 metadata:

@@ -27,4 +27,4 @@ autoscaling:
   scaleDownStabilization: 300
 
 gateway:
-  configcluster: central-cluster
+  enable: false
