@@ -128,6 +128,7 @@ module "k8s-mario-east" {
   min_replicas     = 1
   max_replicas     = 5
   image            = "sevenajay/mario:latest"
+  config_cluster   = false
 }
 
 module "k8s-mario-central" {
@@ -140,6 +141,7 @@ module "k8s-mario-central" {
   min_replicas     = 1
   max_replicas     = 5
   image            = "sevenajay/mario:latest"
+  config_cluster   = true
 }
 
 module "k8s-mario-west" {
@@ -152,4 +154,5 @@ module "k8s-mario-west" {
   min_replicas     = 1
   max_replicas     = 5
   image            = "sevenajay/mario:latest"
+  config_cluster   = false
 }
