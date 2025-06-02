@@ -27,9 +27,6 @@ resource "helm_release" "mario" {
         repository = split(":", var.image)[0]
         tag        = split(":", var.image)[1]
       }
-      service = {
-        port = 80
-      }
       autoscaling = {
         minReplicas = var.min_replicas
         maxReplicas = var.max_replicas
