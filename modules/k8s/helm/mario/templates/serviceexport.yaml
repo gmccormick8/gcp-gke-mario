@@ -3,3 +3,6 @@ kind: ServiceExport
 metadata:
   name: mario-service
   namespace: mario
+  annotations:
+    networking.gke.io/enable-service-export: "true"
+    networking.gke.io/export-to-global-scope: "true"

@@ -5,9 +5,16 @@ metadata:
   namespace: mario
   labels:
     app: mario
+  annotations:
+    cloud.google.com/backend-config: '{"default": "mario-backend-config"}'
+    cloud.google.com/neg: '{"ingress": true}'
+    networking.gke.io/service-access: "global"
 spec:
+  type: ClusterIP
   ports:
-    - port: {{.Values.service.port}}
+    - port: { { .Values.service.port } }
       targetPort: 80
+      protocol: TCP
+      name: http
   selector:
     app: mario
