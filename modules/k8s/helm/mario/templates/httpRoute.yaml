@@ -6,21 +6,14 @@ metadata:
   labels:
     app: mario-service
     gateway: multi-cluster-gateway
-  annotations:
-    networking.gke.io/retry-timeout: "300s" # Wait longer for ServiceImport
 spec:
   parentRefs:
     - kind: Gateway
       name: mario-external-gateway
       namespace: mario
   rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
+    - backendRefs:
         - group: net.gke.io
           kind: ServiceImport
           name: mario-service
           port: 80
-          weight: 1
