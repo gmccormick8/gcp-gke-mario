@@ -1,4 +1,7 @@
-data "kubernetes_service_v1" "mario_lb" {
+data "kubernetes_resource" "mario_gateway" {
+  api_version = "gateway.networking.k8s.io/v1beta1"
+  kind        = "Gateway"
+
   metadata {
     name      = "mario-external-gateway"
     namespace = "mario"
@@ -11,5 +14,5 @@ data "kubernetes_service_v1" "mario_lb" {
 
 output "load_balancer_ip" {
   description = "The IP address of the global load balancer"
-  value       = try(data.kubernetes_service_v1.mario_lb.status.0.load_balancer.0.ingress.0.ip, null)
+  value       = try(data.kubernetes_resource.mario_gateway.object.status.addresses[0].value, null)
 }
