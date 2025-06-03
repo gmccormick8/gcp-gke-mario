@@ -24,6 +24,12 @@ resource "null_resource" "wait_for_crds" {
         echo "Waiting for Multi-cluster Services Feature to be enabled..."
         sleep 30
       done
+
+      # Wait for ServiceExport CRD to be available
+      until kubectl get crd serviceexports.net.gke.io > /dev/null 2>&1; do
+        echo "Waiting for ServiceExport CRD to be available..."
+        sleep 10
+      done
     EOT
   }
 }
