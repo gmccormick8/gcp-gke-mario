@@ -1,23 +1,27 @@
-# Kubernetes Multi-Cluster Module for Mario Application
+# Kubernetes Module for Multi-Cluster Mario Deployment
 
-This module deploys the Super Mario game across multiple GKE clusters using Gateway API for global load balancing.
+This module deploys the Super Mario browser game across GKE clusters using Gateway API and multi-cluster service discovery.
+
+## Architecture
+
+```mermaid
+graph LR
+    GLB[Global Load Balancer] --> GW1[Gateway us-east]
+    GLB --> GW2[Gateway us-central]
+    GLB --> GW3[Gateway us-west]
+    GW1 --> S1[Mario Service]
+    GW2 --> S2[Mario Service]
+    GW3 --> S3[Mario Service]
+```
 
 ## Features
 
-- Multi-cluster deployment with Gateway API
-- Global load balancing across regions
-- Automated failover and traffic distribution
-- Helm-based deployment in each cluster
+- Gateway API integration for global load balancing
+- Multi-cluster service discovery
 - Horizontal Pod Autoscaling (HPA)
+- Readiness probes and health checks
 - Resource limits and requests
-
-## Prerequisites
-
-- Multiple GKE Clusters with Gateway API enabled
-- Fleet registration enabled (requires gkehub.googleapis.com)
-- Helm 3.x
-- kubectl configured with cluster access
-- Compute Engine API enabled (compute.googleapis.com)
+- Non-root container security context
 
 ## Usage
 
@@ -25,111 +29,132 @@ This module deploys the Super Mario game across multiple GKE clusters using Gate
 module "k8s_mario" {
   source = "./modules/k8s"
 
-  project_id = "my-project-id"
-  clusters = {
-    east = {
-      name     = "east-cluster"
-      location = "us-east5-c"
-      endpoint = "cluster-endpoint"
-      ca_cert  = "base64-encoded-ca-cert"
-    }
-    central = {
-      name     = "central-cluster"
-      location = "us-central1-c"
-      endpoint = "cluster-endpoint"
-      ca_cert  = "base64-encoded-ca-cert"
-    }
-    west = {
-      name     = "west-cluster"
-      location = "us-west4-c"
-      endpoint = "cluster-endpoint"
-      ca_cert  = "base64-encoded-ca-cert"
-    }
-  }
-  image        = "sevenajay/mario:latest"
-  min_replicas = 1
-  max_replicas = 5
+  project_id       = "my-project"
+  cluster_name     = "central-cluster"
+  cluster_location = "us-central1-c"
+  cluster_endpoint = "https://35.x.x.x"
+  cluster_ca_cert  = "base64_encoded_cert"
+  config_cluster   = true  # Enable Gateway config on this cluster
+
+  image         = "sevenajay/mario:latest"
+  min_replicas  = 1
+  max_replicas  = 5
 }
 ```
 
-## Module Variables
+## Requirements
 
-| Name         | Description                                     | Type        | Required |
-| ------------ | ----------------------------------------------- | ----------- | :------: |
-| project_id   | GCP Project ID                                  | string      |   yes    |
-| clusters     | Map of cluster configurations                   | map(object) |   yes    |
-| image        | Docker image for Mario (format: repository:tag) | string      |   yes    |
-| min_replicas | Minimum number of pod replicas per cluster      | number      |    no    |
-| max_replicas | Maximum number of pod replicas per cluster      | number      |    no    |
+- Terraform ~> 1.11
+- GKE cluster with Gateway API enabled
+- Following APIs enabled:
+  - container.googleapis.com
+  - gkehub.googleapis.com
+  - multiclusterservicediscovery.googleapis.com
+  - multiclusteringress.googleapis.com
 
-## Helm Chart Configuration
+## Variables
 
-### Default Resource Limits
+| Name             | Description                  | Type   | Required |
+| ---------------- | ---------------------------- | ------ | :------: |
+| project_id       | GCP Project ID               | string |   yes    |
+| cluster_name     | GKE cluster name             | string |   yes    |
+| cluster_location | GKE cluster location         | string |   yes    |
+| cluster_endpoint | GKE cluster endpoint         | string |   yes    |
+| cluster_ca_cert  | GKE cluster CA certificate   | string |   yes    |
+| config_cluster   | Enable Gateway configuration | bool   |   yes    |
+| image            | Mario container image        | string |   yes    |
+| min_replicas     | Minimum pod replicas         | number |    no    |
+| max_replicas     | Maximum pod replicas         | number |    no    |
+
+## Resource Configurations
+
+### Pod Resources
 
 ```yaml
 resources:
   limits:
     cpu: 500m
     memory: 1000Mi
-    ephemeral-storage: 4Gi
   requests:
     cpu: 250m
     memory: 512Mi
-    ephemeral-storage: 2Gi
 ```
 
-### Autoscaling Configuration
+### HPA Settings
 
 ```yaml
 autoscaling:
-  enabled: true
   cpuUtilization: 75
-  memoryUtilization: 75
-  scaleUpStabilization: 60
-  scaleDownStabilization: 300
+  scaleUpStabilization: 60s
+  scaleDownStabilization: 300s
 ```
 
-## Gateway API Configuration
+## Monitoring
 
-The module configures:
+Monitor deployment health:
 
-- GatewayClass for global load balancing
-- Gateway for HTTP traffic
-- HTTPRoute for traffic distribution across clusters
-- Automatic health checking and failover
-- Intelligent traffic routing based on user location
+```bash
+# Check Gateway status
+kubectl get gateway -n mario
 
-## Outputs
+# View service discovery
+kubectl get serviceimport -n mario
 
-| Name             | Description                                     |
-| ---------------- | ----------------------------------------------- |
-| load_balancer_ip | Global IP address for accessing the application |
-
-## Security Features
-
-- Non-privileged container execution
-- No privilege escalation allowed
-- Resource limits enforced
-- Readiness probe for health checking
+# Monitor pod scaling
+kubectl get hpa -n mario
+```
 
 ## Troubleshooting
 
-1. If pods fail to start, check resource quotas:
+1. Gateway Issues
 
-   ```bash
-   kubectl describe pod -n mario
-   ```
+```bash
+# Check Gateway status
+kubectl describe gateway mario-external-gateway -n mario
 
-2. For load balancer issues:
+# View Gateway events
+kubectl get events -n mario --field-selector involvedObject.kind=Gateway
+```
 
-   ```bash
-   kubectl get svc -n mario
-   ```
+2. Service Discovery Issues
 
-3. To check autoscaling status:
-   ```bash
-   kubectl get hpa -n mario
-   ```
+```bash
+# Verify ServiceExport
+kubectl describe serviceexport mario-service -n mario
+
+# Check ServiceImport status
+kubectl get serviceimport mario-service -n mario -o yaml
+```
+
+3. Pod Issues
+
+```bash
+# Get pod logs
+kubectl logs -l app=mario -n mario
+
+# Check pod events
+kubectl get events -n mario --field-selector involvedObject.kind=Pod
+```
+
+## Limitations
+
+- Gateway API must be enabled on all clusters
+- Clusters must be registered to the same fleet
+- Only HTTP traffic is supported
+- Load balancer provisioning takes ~5 minutes
+
+## Outputs
+
+| Name             | Description             |
+| ---------------- | ----------------------- |
+| load_balancer_ip | Global load balancer IP |
+
+## Security
+
+- Non-root container execution
+- No privilege escalation
+- Resource limits enforced
+- Network policy ready
 
 ## License
 

@@ -1,112 +1,95 @@
-# gcp-gke-mario
+# GCP GKE Mario
 
-Deploy Super Mario in the browser using GKE (Google Kubernetes Engine) with multi-regional infrastructure and global load balancing.
-
-## Architecture
-
-This project deploys:
-
-- A VPC network with subnets in three regions (us-east5, us-central1, us-west4)
-- Three GKE clusters, one in each region, configured in a fleet
-- Cloud NAT in each region for internet egress
-- Gateway API for multi-cluster load balancing
-- Super Mario browser game deployed across all clusters
-- Global load balancer for optimal user routing
-- Automated horizontal pod scaling in each cluster
+Deploy Super Mario in the browser using GKE with a global multi-cluster infrastructure. This project demonstrates modern cloud-native patterns including multi-cluster load balancing, Gateway API, and automated scaling.
 
 ## Features
 
-- Multi-regional deployment for high availability
-- Global load balancing with Gateway API
-- Automatic failover between regions
-- Location-based routing for reduced latency
-- Fleet management for centralized control
-- Secure private GKE clusters
-- Automated scaling based on demand
+- **Multi-Regional Infrastructure**
+
+  - VPC network with subnets across US regions
+  - Private GKE clusters with managed control planes
+  - Cloud NAT for secure internet egress
+  - Regional failover and redundancy
+
+- **Kubernetes Infrastructure**
+
+  - Three GKE clusters in different regions
+  - Fleet management for unified control
+  - Gateway API for global load balancing
+  - Automated horizontal pod scaling
+  - Binary authorization enabled
+  - Workload identity for security
+
+- **Application Platform**
+  - Super Mario browser game deployment
+  - Global load balancer for optimal routing
+  - Automatic failover between regions
+  - Geographic-based request routing
+  - Helm-based deployment automation
 
 ## Prerequisites
 
-### Required Software
-
-- Google Cloud SDK installed and configured
+- Google Cloud SDK
 - Terraform ~> 1.11.0
-- kubectl (can be installed via gcloud)
-- A Google Cloud Project with billing enabled
-
-### Required GCP APIs
-
-The setup script will automatically enable these APIs:
-
-```bash
-compute.googleapis.com
-container.googleapis.com
-iam.googleapis.com
-gkehub.googleapis.com
-```
+- Active GCP Project with billing
+- Required permissions:
+  - Project Owner or Editor
+  - Kubernetes Engine Admin
+  - Service Account Admin
 
 ## Quick Start
 
 1. Clone this repository:
 
 ```bash
-git clone https://github.com/yourusername/gcp-gke-mario.git
+git clone https://github.com/gabrielmccormick/gcp-gke-mario.git
 cd gcp-gke-mario
 ```
 
 2. Run the setup script:
 
 ```bash
- bash setup.sh
+bash setup.sh
 ```
 
-The script will:
+The setup process:
 
-- Enable required APIs
-- Check/update Terraform version
-- Create terraform.tfvars with your project ID and current IP
-- Initialize Terraform
-- Show the planned changes
-- Apply the configuration (with your approval)
+- Enables required GCP APIs
+- Verifies/updates Terraform version
+- Creates terraform.tfvars with your project ID
+- Initializes and applies Terraform configuration
 
 ## Architecture Details
 
 ### Networking
 
-- Custom VPC network with regional subnets
-- Private GKE clusters with public control plane endpoints
-- Cloud NAT gateways for outbound internet access
+- Custom VPC with regional subnets (us-east5, us-central1, us-west4)
+- Private GKE clusters with external control plane access
+- Cloud NAT for outbound internet connectivity
 - Global load balancing via Gateway API
 
-### Kubernetes Infrastructure
+### GKE Clusters
 
-- Three regional GKE clusters
-- Fleet registration for multi-cluster management
-- Workload identity enabled
-- Binary authorization enforced
-- Node auto-scaling configured
-- Regular release channel for updates
+- Three regional clusters for high availability
+- Private nodes with VPC-native networking
+- Workload identity for secure service accounts
+- Regular release channel for stable updates
+- Node auto-scaling and auto-repair
 
-### Application Deployment
+### Mario Application
 
-- Helm-based deployment across all clusters
-- Horizontal Pod Autoscaling
+- Containerized Super Mario browser game
+- Deployed across all clusters using Helm
+- Horizontal Pod Autoscaling enabled
 - Resource limits and requests defined
-- Readiness probes configured
-- Non-root container execution
+- Health checks and readiness probes
 
-### Load Balancing
+## Monitoring
 
-- Multi-cluster Gateway API configuration
-- Health checking and automatic failover
-- Geographic-based traffic routing
-- Equal traffic distribution across healthy endpoints
-
-## Monitoring & Management
-
-Access Kubernetes resources:
+Access cluster resources:
 
 ```bash
-# Configure kubectl context
+# Get credentials for a cluster
 gcloud container clusters get-credentials [CLUSTER_NAME] --region [REGION]
 
 # View deployments
@@ -121,26 +104,32 @@ kubectl get gateway,httproute -n mario
 
 ## Clean Up
 
-To destroy all resources:
+Remove all created resources:
 
 ```bash
-terraform destroy -auto-approve
+terraform destroy --auto-approve
 ```
 
-This will remove:
+## Contributing
 
-- All GKE clusters
-- The VPC network and subnets
-- Cloud NAT gateways
-- Load balancers
-- Associated service accounts
+1. Fork the repository
+2. Create a feature branch
+3. Submit a pull request
 
 ## Notes
 
-- Initial deployment takes approximately 15-20 minutes
-- Load balancer provisioning may take an additional 5-10 minutes
-- The Mario game will be available at the URL provided in the terraform output
-- Resource usage is optimized for cost-effectiveness while maintaining reliability
+- Initial deployment takes ~20 minutes
+- Load balancer provisioning requires ~5 minutes
+- Access Mario at the URL from terraform output
+- Resources optimized for demo purposes
+
+## Support
+
+Create an issue for:
+
+- Bug reports
+- Feature requests
+- Deployment questions
 
 ## License
 
