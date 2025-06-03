@@ -104,6 +104,12 @@ resource "google_gke_hub_feature" "mcs" {
   name     = "multiclusterservicediscovery"
   project  = var.project_id
   location = "global"
+
+  depends_on = [ 
+    module.prod-east-cluster,
+    module.prod-central-cluster,
+    module.prod-west-cluster
+  ]
 }
 
 resource "google_gke_hub_feature" "mci" {
@@ -116,6 +122,8 @@ resource "google_gke_hub_feature" "mci" {
       config_membership = "projects/${var.project_id}/locations/us-central1/memberships/${module.prod-central-cluster.cluster_name}"
     }
   }
+
+  depends_on = [ google_gke_hub_feature.mcs ]
 }
 
 module "k8s-mario-east" {
