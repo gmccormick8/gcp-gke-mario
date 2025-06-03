@@ -14,14 +14,18 @@ provider "helm" {
   }
 }
 
-# Wait for Multi-cluster Service Discovery CRDs to be available
 resource "null_resource" "wait_for_crds" {
   provisioner "local-exec" {
     command = <<EOT
-      until kubectl get crd serviceexports.net.gke.io --context=gke_${var.project_id}_${var.cluster_location}_${var.cluster_name}; do
+      echo "${base64decode(var.cluster_ca_cert)}" > ca.crt
+      until kubectl --server="https://${var.cluster_endpoint}" \
+                   --token="${data.google_client_config.default.access_token}" \
+                   --certificate-authority=ca.crt \
+                   get crd serviceexports.net.gke.io; do
         echo "Waiting for ServiceExport CRD to be available..."
         sleep 10
       done
+      rm ca.crt
     EOT
   }
 }
