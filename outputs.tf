@@ -14,7 +14,10 @@ data "kubernetes_resource" "mario_gateway" {
   ]
 }
 
-output "mario_endpoint" {
-  description = "You can access the Mario game at this URL"
-  value       = try("http://${data.kubernetes_resource.mario_gateway.object.status.addresses[0].value}")
+output "mario_gateway_url" {
+  description = "The external load balancer IP address for the Mario game"
+  value = try(
+    "You can access the Mario game at: http://${data.kubernetes_resource.mario_gateway.object.status.addresses[0].value}",
+    "Waiting for load balancer IP... (this can take up to 5 minutes)"
+  )
 }
