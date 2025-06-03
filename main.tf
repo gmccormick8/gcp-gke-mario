@@ -105,7 +105,7 @@ resource "google_gke_hub_feature" "mcs" {
   project  = var.project_id
   location = "global"
 
-  depends_on = [ 
+  depends_on = [
     module.prod-east-cluster,
     module.prod-central-cluster,
     module.prod-west-cluster
@@ -123,7 +123,7 @@ resource "google_gke_hub_feature" "mci" {
     }
   }
 
-  depends_on = [ google_gke_hub_feature.mcs ]
+  depends_on = [google_gke_hub_feature.mcs]
 }
 
 module "k8s-mario-east" {
