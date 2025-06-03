@@ -13,5 +13,5 @@ data "kubernetes_service_v1" "mario_lb" {
 
 output "load_balancer_ip" {
   description = "The IP address of the global load balancer"
-  value       = var.config_cluster ? data.kubernetes_service_v1.mario_lb[0].status[0].load_balancer[0].ingress[0].ip : null
+  value       = data.kubernetes_service_v1.mario_lb[0].status[0].load_balancer[0].ingress[0].ip
 }
