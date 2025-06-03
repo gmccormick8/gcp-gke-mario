@@ -12,5 +12,5 @@ data "kubernetes_service_v1" "mario_lb" {
 
 output "load_balancer_ip" {
   description = "The IP address of the global load balancer"
-  value       = data.kubernetes_service_v1.mario_lb.status.load_balancer.ingress.ip
+  value       = data.kubernetes_service_v1.mario_lb.object.status.addresses[0].value
 }
