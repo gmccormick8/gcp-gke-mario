@@ -118,7 +118,7 @@ resource "google_container_node_pool" "primary_nodes" {
   upgrade_settings {
     strategy        = "SURGE"
     max_surge       = max(ceil(var.min_node_count * 0.25), 1)
-    max_unavailable = 0 # Ensure we maintain minimum availability during upgrades
+    max_unavailable = 0
   }
 
 }
