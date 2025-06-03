@@ -33,9 +33,19 @@ provider "google-beta" {
   project = var.project_id
 }
 
+data "google_client_config" "default" {}
+
 provider "kubernetes" {
   alias                  = "central"
   host                   = "https://${module.prod-central-cluster.cluster_endpoint}"
   token                  = data.google_client_config.default.access_token
   cluster_ca_certificate = base64decode(module.prod-central-cluster.master_auth.cluster_ca_certificate)
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = "https://${module.prod-central-cluster.cluster_endpoint}"
+    token                  = data.google_client_config.default.access_token
+    cluster_ca_certificate = base64decode(module.prod-central-cluster.master_auth.cluster_ca_certificate)
+  }
 }

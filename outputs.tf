@@ -1,4 +1,6 @@
 data "kubernetes_resource" "mario_gateway" {
+  provider = kubernetes.central
+
   api_version = "gateway.networking.k8s.io/v1beta1"
   kind        = "Gateway"
 
@@ -7,8 +9,6 @@ data "kubernetes_resource" "mario_gateway" {
     namespace = "mario"
   }
 
-  provider = kubernetes.central
-
   depends_on = [
     module.k8s-mario-central
   ]
@@ -16,5 +16,5 @@ data "kubernetes_resource" "mario_gateway" {
 
 output "mario_endpoint" {
   description = "You can access the Mario game at this URL"
-  value = try("http://${data.kubernetes_resource.mario_gateway.object.status.addresses[0].value}")
+  value       = try("http://${data.kubernetes_resource.mario_gateway.object.status.addresses[0].value}")
 }
