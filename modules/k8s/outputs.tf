@@ -1,5 +1,4 @@
 data "kubernetes_service_v1" "mario_lb" {
-  count = var.config_cluster ? 1 : 0
 
   metadata {
     name      = "mario-external-gateway"
@@ -13,5 +12,5 @@ data "kubernetes_service_v1" "mario_lb" {
 
 output "load_balancer_ip" {
   description = "The IP address of the global load balancer"
-  value       = data.kubernetes_service_v1.mario_lb[0].status[0].load_balancer[0].ingress[0].ip
+  value       = data.kubernetes_service_v1.mario_lb.status.load_balancer.ingress.ip
 }
