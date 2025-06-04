@@ -14,14 +14,8 @@ provider "helm" {
   }
 }
 
-resource "time_sleep" "wait_for_crds" {
-  create_duration = "180s"
-}
-
 # Deploy Mario to cluster
 resource "helm_release" "mario" {
-  depends_on = [time_sleep.wait_for_crds]
-
   name             = "mario-${var.cluster_name}"
   chart            = "${path.module}/helm/mario"
   namespace        = "mario"

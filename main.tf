@@ -126,6 +126,18 @@ resource "google_gke_hub_feature" "mci" {
   depends_on = [google_gke_hub_feature.mcs]
 }
 
+resource "time_sleep" "wait_for_clusters" {
+  create_duration = "120s"
+
+  triggers = {
+    cluster_east     = module.prod-east-cluster.cluster_id
+    cluster_central  = module.prod-central-cluster.cluster_id
+    cluster_west     = module.prod-west-cluster.cluster_id
+    mcs_feature      = google_gke_hub_feature.mcs.id
+    mci_feature      = google_gke_hub_feature.mci.id
+  }
+}
+
 module "k8s-mario-east" {
   source           = "./modules/k8s"
   project_id       = var.project_id
@@ -137,6 +149,8 @@ module "k8s-mario-east" {
   max_replicas     = 5
   image            = "sevenajay/mario:latest"
   config_cluster   = false
+
+  depends_on = [time_sleep.wait_for_clusters]
 }
 
 module "k8s-mario-central" {
@@ -150,6 +164,8 @@ module "k8s-mario-central" {
   max_replicas     = 5
   image            = "sevenajay/mario:latest"
   config_cluster   = true
+
+  depends_on = [time_sleep.wait_for_clusters]
 }
 
 module "k8s-mario-west" {
@@ -163,6 +179,8 @@ module "k8s-mario-west" {
   max_replicas     = 5
   image            = "sevenajay/mario:latest"
   config_cluster   = false
+
+  depends_on = [time_sleep.wait_for_clusters]
 }
 
 # Cleanup dynamically created firewall rules for GKE clusters
