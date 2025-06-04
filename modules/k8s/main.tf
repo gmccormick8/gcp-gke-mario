@@ -20,8 +20,6 @@ provider "kubernetes" {
   host                   = "https://${var.cluster_endpoint}"
   token                  = data.google_client_config.default.access_token
   cluster_ca_certificate = base64decode(var.cluster_ca_cert)
-
-  depends_on = [time_sleep.wait_for_cluster_auth]
 }
 
 provider "helm" {
@@ -30,8 +28,6 @@ provider "helm" {
     token                  = data.google_client_config.default.access_token
     cluster_ca_certificate = base64decode(var.cluster_ca_cert)
   }
-
-  depends_on = [time_sleep.wait_for_cluster_auth]
 }
 
 # Deploy Mario to cluster
