@@ -172,7 +172,7 @@ resource "terraform_data" "gke_fw_cleanup" {
   }
 
   provisioner "local-exec" {
-    when = destroy
+    when    = destroy
     command = "gcloud compute firewall-rules delete $(gcloud compute firewall-rules list --project=${self.triggers_replace.project_id} --filter='name~^gke-.*-.*-[0-9a-f]+-mcsd$' --format='value(name)') --project=${self.triggers_replace.project_id} --quiet"
   }
 }
