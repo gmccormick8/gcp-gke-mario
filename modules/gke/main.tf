@@ -120,22 +120,4 @@ resource "google_container_node_pool" "primary_nodes" {
     max_surge       = max(ceil(var.min_node_count * 0.25), 1)
     max_unavailable = 0
   }
-
-}
-
-resource "null_resource" "gke_cleanup" {
-  triggers = {
-    cluster_name = google_container_cluster.primary.name
-    project_id   = var.project_id
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = <<-EOT
-      fw_rules=$(gcloud compute firewall-rules list --project=${self.triggers.project_id} --filter="name~^gke-${self.triggers.cluster_name}-.*mcsd$" --format="get(name)")
-      for rule in $fw_rules; do
-        gcloud compute firewall-rules delete "$rule" --project=${self.triggers.project_id} --quiet || true
-      done
-    EOT
-  }
 }

@@ -15,28 +15,14 @@ provider "helm" {
 }
 
 # Wait for Multi-cluster Service Discovery CRDs to be available
-resource "null_resource" "wait_for_crds" {
-  provisioner "local-exec" {
-    command = <<EOT
-      # Wait for Multi-cluster Services Feature to be enabled
-      until gcloud container fleet multi-cluster-services describe \
-        --project="${var.project_id}" > /dev/null 2>&1; do
-        echo "Waiting for Multi-cluster Services Feature to be enabled..."
-        sleep 30
-      done
+resource "time_sleep" "wait_for_crds" {
 
-      # Wait for ServiceExport CRD to be available
-      until kubectl get crd serviceexports.net.gke.io > /dev/null 2>&1; do
-        echo "Waiting for ServiceExport CRD to be available..."
-        sleep 10
-      done
-    EOT
-  }
+  create_duration = "120s"
 }
 
 # Deploy Mario to cluster
 resource "helm_release" "mario" {
-  depends_on = [null_resource.wait_for_crds]
+  depends_on = [time_sleep.wait_for_crds]
 
   name             = "mario-${var.cluster_name}"
   chart            = "${path.module}/helm/mario"

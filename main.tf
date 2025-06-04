@@ -164,3 +164,11 @@ module "k8s-mario-west" {
   image            = "sevenajay/mario:latest"
   config_cluster   = false
 }
+
+# Cleanup dynamically created firewall rules for GKE clusters
+resource "terraform_data" "gke_fw_cleanup" {
+  provisioner "local-exec" {
+    when    = destroy
+    command = "gcloud compute firewall-rules list --project=${var.project_id} --filter='name:^gke-[^-]+-[^-]+-mcsd$' --format='value(name)' --quiet"
+  }
+}
