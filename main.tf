@@ -130,11 +130,11 @@ resource "time_sleep" "wait_for_clusters" {
   create_duration = "120s"
 
   triggers = {
-    cluster_east     = module.prod-east-cluster.cluster_id
-    cluster_central  = module.prod-central-cluster.cluster_id
-    cluster_west     = module.prod-west-cluster.cluster_id
-    mcs_feature      = google_gke_hub_feature.mcs.id
-    mci_feature      = google_gke_hub_feature.mci.id
+    cluster_east    = module.prod-east-cluster.cluster_id
+    cluster_central = module.prod-central-cluster.cluster_id
+    cluster_west    = module.prod-west-cluster.cluster_id
+    mcs_feature     = google_gke_hub_feature.mcs.id
+    mci_feature     = google_gke_hub_feature.mci.id
   }
 }
 
