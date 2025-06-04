@@ -14,15 +14,35 @@ provider "helm" {
   }
 }
 
-# Wait for Multi-cluster Service Discovery CRDs to be available
-resource "time_sleep" "wait_for_crds" {
+# Check for ServiceExport CRD
+resource "kubernetes_manifest" "check_service_export_crd" {
+  manifest = {
+    apiVersion = "apiextensions.k8s.io/v1"
+    kind       = "CustomResourceDefinition"
+    metadata = {
+      name = "serviceexports.net.gke.io"
+    }
+  }
 
-  create_duration = "120s"
+  timeouts {
+    create = "5m"
+  }
+}
+
+# Fallback wait if CRD check fails
+resource "null_resource" "wait_for_crds" {
+  triggers = {
+    always_run = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = "sleep 180"
+  }
 }
 
 # Deploy Mario to cluster
 resource "helm_release" "mario" {
-  depends_on = [time_sleep.wait_for_crds]
+  depends_on = [kubernetes_manifest.check_service_export_crd, null_resource.wait_for_crds]
 
   name             = "mario-${var.cluster_name}"
   chart            = "${path.module}/helm/mario"
