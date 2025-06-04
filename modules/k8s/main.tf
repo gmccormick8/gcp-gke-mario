@@ -30,7 +30,7 @@ resource "kubernetes_manifest" "check_service_export_crd" {
 }
 
 # Fallback wait if CRD check fails
-resource "null_resource" "wait_for_crds" {
+resource "terraform_data" "wait_for_crds" {
   triggers = {
     always_run = timestamp()
   }
@@ -42,7 +42,7 @@ resource "null_resource" "wait_for_crds" {
 
 # Deploy Mario to cluster
 resource "helm_release" "mario" {
-  depends_on = [kubernetes_manifest.check_service_export_crd, null_resource.wait_for_crds]
+  depends_on = [kubernetes_manifest.check_service_export_crd, terraform_data.wait_for_crds]
 
   name             = "mario-${var.cluster_name}"
   chart            = "${path.module}/helm/mario"
