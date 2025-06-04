@@ -149,8 +149,6 @@ module "k8s-mario-east" {
   max_replicas     = 5
   image            = "sevenajay/mario:latest"
   config_cluster   = false
-
-  depends_on = [time_sleep.wait_for_clusters]
 }
 
 module "k8s-mario-central" {
@@ -164,8 +162,6 @@ module "k8s-mario-central" {
   max_replicas     = 5
   image            = "sevenajay/mario:latest"
   config_cluster   = true
-
-  depends_on = [time_sleep.wait_for_clusters]
 }
 
 module "k8s-mario-west" {
@@ -179,8 +175,6 @@ module "k8s-mario-west" {
   max_replicas     = 5
   image            = "sevenajay/mario:latest"
   config_cluster   = false
-
-  depends_on = [time_sleep.wait_for_clusters]
 }
 
 # Cleanup dynamically created firewall rules for GKE clusters
