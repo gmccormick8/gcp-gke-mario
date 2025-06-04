@@ -167,11 +167,12 @@ module "k8s-mario-west" {
 
 # Cleanup dynamically created firewall rules for GKE clusters
 resource "terraform_data" "gke_fw_cleanup" {
+  triggers_replace = {
+    project_id = var.project_id
+  }
+
   provisioner "local-exec" {
     when = destroy
-    environment = {
-      PROJECT_ID = var.project_id
-    }
-    command = "gcloud compute firewall-rules list --project=$PROJECT_ID --filter='name:^gke-[^-]+-[^-]+-mcsd$' --format='value(name)' --quiet"
+    command = "gcloud compute firewall-rules delete $(gcloud compute firewall-rules list --project=${self.triggers_replace.project_id} --filter='name:^gke-[^-]+-[^-]+-mcsd$' --format='value(name)' | tr '\n' ' ') --project=${self.triggers_replace.project_id} --quiet"
   }
 }
