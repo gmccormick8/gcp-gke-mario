@@ -128,7 +128,7 @@ resource "google_gke_hub_feature" "mci" {
 
 # Add wait for clusters to be ready
 resource "time_sleep" "wait_for_clusters" {
-  create_duration = "120s"
+  create_duration = "360s"
 
   triggers = {
     cluster_east    = module.prod-east-cluster.cluster_name

@@ -1,6 +1,6 @@
-# Wait for metrics API and cluster auth
+# Wait for cluster auth
 resource "time_sleep" "wait_for_cluster_auth" {
-  create_duration = "360s"
+  create_duration = "120s"
 
   triggers = {
     cluster_endpoint = var.cluster_endpoint
