@@ -7,7 +7,6 @@ resource "time_sleep" "wait_for_cluster_auth" {
   triggers = {
     cluster_endpoint = var.cluster_endpoint
     cluster_ca_cert  = var.cluster_ca_cert
-    mcs_check        = google_gke_hub_feature.mcs.id # Reference MCS feature to ensure it's ready
   }
 }
 
