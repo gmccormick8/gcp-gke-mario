@@ -11,8 +11,6 @@ locals {
       master_ipv4_cidr     = "172.16.0.0/28"
       
       # K8s deployment config
-      kubernetes_provider   = kubernetes.east
-      helm_provider        = helm.east
       config_cluster       = false
     }
     central = {
@@ -26,8 +24,6 @@ locals {
       master_ipv4_cidr     = "172.16.1.0/28"
       
       # K8s deployment config
-      kubernetes_provider   = kubernetes.central
-      helm_provider        = helm.central
       config_cluster       = true
     }
     west = {
@@ -41,8 +37,6 @@ locals {
       master_ipv4_cidr     = "172.16.2.0/28"
       
       # K8s deployment config
-      kubernetes_provider   = kubernetes.west
-      helm_provider        = helm.west
       config_cluster       = false
     }
   }
@@ -166,14 +160,14 @@ module "k8s-mario" {
   image            = "sevenajay/mario:latest"
   config_cluster   = each.value.config_cluster
   providers = {
-    kubernetes = each.value.kubernetes_provider
-    helm       = each.value.helm_provider
+    kubernetes = "kubernetes.${each.key}"
+    helm       = "helm.${each.key}"
   }
 
   depends_on = [
     google_gke_hub_feature.mcs,
     google_gke_hub_feature.mci,
-    module.gke_clusters[each.key]
+    module.gke_clusters
   ]
 }
 
