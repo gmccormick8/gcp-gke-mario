@@ -181,14 +181,25 @@ module "k8s-mario-west" {
 # Cleanup dynamically created firewall rules for GKE clusters
 resource "terraform_data" "gke_fw_cleanup" {
   triggers_replace = {
-    project_id = var.project_id
+    project_id      = var.project_id
     central_cluster = module.prod-central-cluster.cluster_name
-    west_cluster = module.prod-west-cluster.cluster_name
-    east_cluster = module.prod-east-cluster.cluster_name
+    west_cluster    = module.prod-west-cluster.cluster_name
+    east_cluster    = module.prod-east-cluster.cluster_name
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "gcloud compute firewall-rules delete $(gcloud compute firewall-rules list --project=${self.triggers_replace.project_id} --filter='name~^gke-.*-.*-[0-9a-f]+-mcsd$' --format='value(name)') --project=${self.triggers_replace.project_id} --quiet"
+    command = <<EOT
+      RULES=$(gcloud compute firewall-rules list --project=${self.triggers_replace.project_id} --filter='name~^gke-.*-.*-[0-9a-f]+-mcsd$' --format='value(name)')
+      if [ ! -z "$RULES" ]; then
+        for RULE in $RULES; do
+          echo "Deleting firewall rule: $RULE"
+          gcloud compute firewall-rules delete $RULE --project=${self.triggers_replace.project_id} --quiet
+      else
+        done
+      else
+        echo "No matching firewall rules found to delete"
+      fi
+    EOT
   }
 }
