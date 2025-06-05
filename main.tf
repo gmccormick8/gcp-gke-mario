@@ -116,10 +116,9 @@ module "gke_clusters" {
 
 # Configure GKE Hub and enable Multi-Cluster Services (MCS)
 resource "google_gke_hub_feature" "mcs" {
-  name          = "multiclusterservicediscovery"
-  project       = var.project_id
-  location      = "global"
-  force_destroy = true
+  name     = "multiclusterservicediscovery"
+  project  = var.project_id
+  location = "global"
 
   depends_on = [
     module.gke_clusters,
@@ -136,7 +135,7 @@ resource "google_gke_hub_feature" "mci" {
 
   spec {
     multiclusteringress {
-      config_membership = "projects/${var.project_id}/locations/us-central1/memberships/${module.prod-central-cluster.cluster_name}"
+      config_membership = "projects/${var.project_id}/locations/${local.clusters["central"].region}/memberships/${module.gke_clusters["central"].cluster_name}"
     }
   }
 
