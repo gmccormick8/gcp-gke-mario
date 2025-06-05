@@ -1,4 +1,54 @@
-# Create a VPC network and subnet
+locals {
+  clusters = {
+    east = {
+      # GKE cluster config
+      cluster_name           = "east-cluster"
+      region                = "us-east5"
+      zone                  = "us-east5-c"
+      subnet_key            = "prod-east-vpc"
+      pods_network_name     = "prod-east-pods"
+      services_network_name = "prod-east-services"
+      master_ipv4_cidr     = "172.16.0.0/28"
+      
+      # K8s deployment config
+      kubernetes_provider   = kubernetes.east
+      helm_provider        = helm.east
+      config_cluster       = false
+    }
+    central = {
+      # GKE cluster config
+      cluster_name           = "central-cluster"
+      region                = "us-central1"
+      zone                  = "us-central1-c"
+      subnet_key            = "prod-central-vpc"
+      pods_network_name     = "prod-central-pods"
+      services_network_name = "prod-central-services"
+      master_ipv4_cidr     = "172.16.1.0/28"
+      
+      # K8s deployment config
+      kubernetes_provider   = kubernetes.central
+      helm_provider        = helm.central
+      config_cluster       = true
+    }
+    west = {
+      # GKE cluster config
+      cluster_name           = "west-cluster"
+      region                = "us-west4"
+      zone                  = "us-west4-c"
+      subnet_key            = "prod-west-vpc"
+      pods_network_name     = "prod-west-pods"
+      services_network_name = "prod-west-services"
+      master_ipv4_cidr     = "172.16.2.0/28"
+      
+      # K8s deployment config
+      kubernetes_provider   = kubernetes.west
+      helm_provider        = helm.west
+      config_cluster       = false
+    }
+  }
+}
+
+# Create a VPC network and subnets
 module "prod-vpc" {
   source       = "./modules/network"
   project_id   = var.project_id
@@ -46,76 +96,49 @@ module "prod-vpc" {
   cloud_nat_configs = ["us-east5", "us-central1", "us-west4"]
 }
 
-module "prod-east-cluster" {
-  source                 = "./modules/gke"
+module "gke_clusters" {
+  for_each = local.clusters
+  source   = "./modules/gke"
+
   project_id             = var.project_id
-  cluster_name           = "east-cluster"
-  zone                   = "${module.prod-vpc.subnets["prod-east-vpc"].region}-c"
+  cluster_name           = each.value.cluster_name
+  zone                   = each.value.zone
   network_name           = module.prod-vpc.network_self_link
-  subnet_name            = module.prod-vpc.subnets["prod-east-vpc"].self_link
-  pods_network_name      = "prod-east-pods"
-  services_network_name  = "prod-east-services"
-  master_ipv4_cidr_block = "172.16.0.0/28"
+  subnet_name            = module.prod-vpc.subnets[each.value.subnet_key].self_link
+  pods_network_name      = each.value.pods_network_name
+  services_network_name  = each.value.services_network_name
+  master_ipv4_cidr_block = each.value.master_ipv4_cidr
   public_ip              = var.public_ip
   min_node_count         = 1
   max_node_count         = 3
   machine_type           = "e2-small"
   disk_size_gb           = 25
   disk_type              = "pd-standard"
+
+  depends_on = [
+    module.prod-vpc
+  ]
 }
 
-module "prod-central-cluster" {
-  source                 = "./modules/gke"
-  project_id             = var.project_id
-  cluster_name           = "central-cluster"
-  zone                   = "${module.prod-vpc.subnets["prod-central-vpc"].region}-c"
-  network_name           = module.prod-vpc.network_self_link
-  subnet_name            = module.prod-vpc.subnets["prod-central-vpc"].self_link
-  pods_network_name      = "prod-central-pods"
-  services_network_name  = "prod-central-services"
-  master_ipv4_cidr_block = "172.16.1.0/28"
-  public_ip              = var.public_ip
-  min_node_count         = 1
-  max_node_count         = 3
-  machine_type           = "e2-small"
-  disk_size_gb           = 25
-  disk_type              = "pd-standard"
-}
-
-module "prod-west-cluster" {
-  source                 = "./modules/gke"
-  project_id             = var.project_id
-  cluster_name           = "west-cluster"
-  zone                   = "${module.prod-vpc.subnets["prod-west-vpc"].region}-c"
-  network_name           = module.prod-vpc.network_self_link
-  subnet_name            = module.prod-vpc.subnets["prod-west-vpc"].self_link
-  pods_network_name      = "prod-west-pods"
-  services_network_name  = "prod-west-services"
-  master_ipv4_cidr_block = "172.16.2.0/28"
-  public_ip              = var.public_ip
-  min_node_count         = 1
-  max_node_count         = 3
-  machine_type           = "e2-small"
-  disk_size_gb           = 25
-  disk_type              = "pd-standard"
-}
-
+# Configure GKE Hub and enable Multi-Cluster Services (MCS)
 resource "google_gke_hub_feature" "mcs" {
   name     = "multiclusterservicediscovery"
   project  = var.project_id
   location = "global"
+  force_destroy = true
 
   depends_on = [
-    module.prod-east-cluster,
-    module.prod-central-cluster,
-    module.prod-west-cluster
+    module.gke_clusters
+    terraform_data.fleet_membership_cleanup
   ]
 }
 
+# Register clusters with GKE Hub and enable Multi-Cluster Ingress (MCI)
 resource "google_gke_hub_feature" "mci" {
   name     = "multiclusteringress"
   project  = var.project_id
   location = "global"
+  force_destroy = true
 
   spec {
     multiclusteringress {
@@ -123,75 +146,34 @@ resource "google_gke_hub_feature" "mci" {
     }
   }
 
-  depends_on = [google_gke_hub_feature.mcs]
-}
-
-module "k8s-mario-east" {
-  source           = "./modules/k8s"
-  project_id       = var.project_id
-  cluster_name     = module.prod-east-cluster.cluster_name
-  cluster_location = module.prod-east-cluster.cluster_location
-  cluster_endpoint = module.prod-east-cluster.cluster_endpoint
-  cluster_ca_cert  = module.prod-east-cluster.master_auth.cluster_ca_certificate
-  min_replicas     = 1
-  max_replicas     = 5
-  image            = "sevenajay/mario:latest"
-  config_cluster   = false
-  providers = {
-    kubernetes = kubernetes.east
-    helm       = helm.east
-  }
-
   depends_on = [
-    google_gke_hub_feature.mcs,
-    google_gke_hub_feature.mci,
-    module.prod-east-cluster
+    module.gke_clusters,
+    terraform_data.fleet_membership_cleanup
   ]
 }
 
-module "k8s-mario-central" {
+# Deploy Mario application to each GKE cluster
+module "k8s-mario" {
+  for_each         = local.clusters
   source           = "./modules/k8s"
   project_id       = var.project_id
-  cluster_name     = module.prod-central-cluster.cluster_name
-  cluster_location = module.prod-central-cluster.cluster_location
-  cluster_endpoint = module.prod-central-cluster.cluster_endpoint
-  cluster_ca_cert  = module.prod-central-cluster.master_auth.cluster_ca_certificate
+  cluster_name     = module.gke_clusters[each.key].cluster_name
+  cluster_location = module.gke_clusters[each.key].cluster_location
+  cluster_endpoint = module.gke_clusters[each.key].cluster_endpoint
+  cluster_ca_cert  = module.gke_clusters[each.key].master_auth.cluster_ca_certificate
   min_replicas     = 1
   max_replicas     = 5
   image            = "sevenajay/mario:latest"
-  config_cluster   = true
+  config_cluster   = each.value.config_cluster
   providers = {
-    kubernetes = kubernetes.central
-    helm       = helm.central
+    kubernetes = each.value.kubernetes_provider
+    helm       = each.value.helm_provider
   }
 
   depends_on = [
     google_gke_hub_feature.mcs,
     google_gke_hub_feature.mci,
-    module.prod-central-cluster
-  ]
-}
-
-module "k8s-mario-west" {
-  source           = "./modules/k8s"
-  project_id       = var.project_id
-  cluster_name     = module.prod-west-cluster.cluster_name
-  cluster_location = module.prod-west-cluster.cluster_location
-  cluster_endpoint = module.prod-west-cluster.cluster_endpoint
-  cluster_ca_cert  = module.prod-west-cluster.master_auth.cluster_ca_certificate
-  min_replicas     = 1
-  max_replicas     = 5
-  image            = "sevenajay/mario:latest"
-  config_cluster   = false
-  providers = {
-    kubernetes = kubernetes.west
-    helm       = helm.west
-  }
-
-  depends_on = [
-    google_gke_hub_feature.mcs,
-    google_gke_hub_feature.mci,
-    module.prod-west-cluster
+    module.gke_clusters[each.key]
   ]
 }
 
@@ -199,9 +181,7 @@ module "k8s-mario-west" {
 resource "terraform_data" "gke_fw_cleanup" {
   triggers_replace = {
     project_id      = var.project_id
-    central_cluster = module.prod-central-cluster.cluster_name
-    west_cluster    = module.prod-west-cluster.cluster_name
-    east_cluster    = module.prod-east-cluster.cluster_name
+    clusters       = join(",", [for k, v in local.clusters : v.cluster_name])
   }
 
   provisioner "local-exec" {
@@ -216,6 +196,31 @@ resource "terraform_data" "gke_fw_cleanup" {
       else
         echo "No matching firewall rules found to delete"
       fi
+    EOT
+  }
+}
+
+# Cleanup dynamically created fleet memberships
+resource "terraform_data" "fleet_membership_cleanup" {
+  triggers_replace = {
+    project_id = var.project_id
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = <<EOT
+      echo "Unregistering clusters from fleet..."
+      for CLUSTER in central east west; do
+        gcloud container clusters update "$${CLUSTER}-cluster" \
+          --project=${self.triggers_replace.project_id} \
+          --location=$(gcloud container clusters list --project=${self.triggers_replace.project_id} --filter="name=$${CLUSTER}-cluster" --format="value(location)") \
+          --unregister-fleet \
+          --quiet || true
+      done
+
+      # Wait for unregistration to complete
+      echo "Waiting 90 seconds for fleet unregistration to complete..."
+      sleep 90
     EOT
   }
 }

@@ -12,5 +12,9 @@ terraform {
       version              = "~> 2.10"
       configuration_aliases = [helm]
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.10"
+    }
   }
 }
