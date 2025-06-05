@@ -53,5 +53,8 @@ resource "helm_release" "mario" {
     })
   ]
 
-  depends_on = [time_sleep.wait_for_cluster_auth]
+  depends_on = [
+    time_sleep.wait_for_cluster_auth,
+    data.google_container_cluster.cluster
+  ]
 }
