@@ -13,7 +13,7 @@ spec:
       namespace: mario
   rules:
     - backendRefs:
-        - group: net.gke.io/v1
+        - group: net.gke.io
           kind: ServiceImport
           name: mario-service
           port: 80
