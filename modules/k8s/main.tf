@@ -2,7 +2,7 @@ data "google_client_config" "default" {}
 
 # Add delay to ensure credentials are propagated
 resource "time_sleep" "wait_for_cluster_auth" {
-  create_duration = "120s"
+  create_duration = "180s"
 
   triggers = {
     cluster_endpoint = var.cluster_endpoint
