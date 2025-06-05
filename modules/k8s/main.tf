@@ -31,5 +31,5 @@ resource "helm_release" "mario" {
     })
   ]
 
-  depends_on = [time_sleep.wait_for_cluster_auth, null_resource.verify_metrics_api]
+  depends_on = [time_sleep.wait_for_cluster_auth ]
 }
