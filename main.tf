@@ -128,10 +128,9 @@ resource "google_gke_hub_feature" "mcs" {
 
 # Register clusters with GKE Hub and enable Multi-Cluster Ingress (MCI)
 resource "google_gke_hub_feature" "mci" {
-  name          = "multiclusteringress"
-  project       = var.project_id
-  location      = "global"
-  force_destroy = true
+  name     = "multiclusteringress"
+  project  = var.project_id
+  location = "global"
 
   spec {
     multiclusteringress {
