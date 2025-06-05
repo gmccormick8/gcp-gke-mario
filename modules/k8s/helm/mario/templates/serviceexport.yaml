@@ -1,7 +1,5 @@
-{{- if .Capabilities.APIVersions.Has "net.gke.io/v1/ServiceExport" }}
 apiVersion: net.gke.io/v1
 kind: ServiceExport
 metadata:
   name: mario-service
   namespace: mario
-{{- end }}

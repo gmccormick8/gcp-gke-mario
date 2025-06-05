@@ -1,5 +1,3 @@
-data "google_client_config" "default" {}
-
 # Increase wait time and add MCS API readiness check
 resource "time_sleep" "wait_for_cluster_auth" {
   create_duration = "300s"
@@ -7,20 +5,6 @@ resource "time_sleep" "wait_for_cluster_auth" {
   triggers = {
     cluster_endpoint = var.cluster_endpoint
     cluster_ca_cert  = var.cluster_ca_cert
-  }
-}
-
-provider "kubernetes" {
-  host                   = "https://${var.cluster_endpoint}"
-  token                  = data.google_client_config.default.access_token
-  cluster_ca_certificate = base64decode(var.cluster_ca_cert)
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = "https://${var.cluster_endpoint}"
-    token                  = data.google_client_config.default.access_token
-    cluster_ca_certificate = base64decode(var.cluster_ca_cert)
   }
 }
 
