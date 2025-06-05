@@ -2,37 +2,15 @@ terraform {
   required_version = "~> 1.11"
 
   required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "~> 6.30"
-    }
     kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.30"
+      source                = "hashicorp/kubernetes"
+      version              = "~> 2.30"
+      configuration_aliases = [kubernetes]
     }
     helm = {
-      source  = "hashicorp/helm"
-      version = "~> 2.10"
+      source                = "hashicorp/helm"
+      version              = "~> 2.10"
+      configuration_aliases = [helm]
     }
-    time = {
-      source  = "hashicorp/time"
-      version = "~> 0.10"
-    }
-  }
-}
-
-data "google_client_config" "default" {}
-
-provider "kubernetes" {
-  host                   = "https://${var.cluster_endpoint}"
-  token                  = data.google_client_config.default.access_token
-  cluster_ca_certificate = base64decode(var.cluster_ca_cert)
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = "https://${var.cluster_endpoint}"
-    token                  = data.google_client_config.default.access_token
-    cluster_ca_certificate = base64decode(var.cluster_ca_cert)
   }
 }
