@@ -146,29 +146,58 @@ resource "google_gke_hub_feature" "mci" {
   ]
 }
 
-# Deploy Mario application to each GKE cluster
-module "k8s-mario" {
-  for_each         = local.clusters
+# Deploy Mario application to the east GKE cluster
+module "k8s-mario-east" {
   source           = "./modules/k8s"
   project_id       = var.project_id
-  cluster_name     = module.gke_clusters[each.key].cluster_name
-  cluster_location = module.gke_clusters[each.key].cluster_location
-  cluster_endpoint = module.gke_clusters[each.key].cluster_endpoint
-  cluster_ca_cert  = module.gke_clusters[each.key].master_auth.cluster_ca_certificate
+  cluster_name     = module.gke_clusters["east"].cluster_name
+  cluster_location = module.gke_clusters["east"].cluster_location
+  cluster_endpoint = module.gke_clusters["east"].cluster_endpoint
+  cluster_ca_cert  = module.gke_clusters["east"].master_auth.cluster_ca_certificate
   min_replicas     = 1
   max_replicas     = 5
   image            = "sevenajay/mario:latest"
-  config_cluster   = each.value.config_cluster
+  config_cluster   = local.clusters.east.config_cluster
   providers = {
-    kubernetes = kubernetes.${each.key}
-    helm       = helm.${each.key}
+    kubernetes = kubernetes.east
+    helm       = helm.east
   }
+}
 
-  depends_on = [
-    google_gke_hub_feature.mcs,
-    google_gke_hub_feature.mci,
-    module.gke_clusters
-  ]
+# Deploy Mario application to the central GKE cluster
+module "k8s-mario-central" {
+  source           = "./modules/k8s"
+  project_id       = var.project_id
+  cluster_name     = module.gke_clusters["central"].cluster_name
+  cluster_location = module.gke_clusters["central"].cluster_location
+  cluster_endpoint = module.gke_clusters["central"].cluster_endpoint
+  cluster_ca_cert  = module.gke_clusters["central"].master_auth.cluster_ca_certificate
+  min_replicas     = 1
+  max_replicas     = 5
+  image            = "sevenajay/mario:latest"
+  config_cluster   = local.clusters.central.config_cluster
+  providers = {
+    kubernetes = kubernetes.central
+    helm       = helm.central
+  }
+}
+
+# Deploy Mario application to the west GKE cluster
+module "k8s-mario-west" {
+  source           = "./modules/k8s"
+  project_id       = var.project_id
+  cluster_name     = module.gke_clusters["west"].cluster_name
+  cluster_location = module.gke_clusters["west"].cluster_location
+  cluster_endpoint = module.gke_clusters["west"].cluster_endpoint
+  cluster_ca_cert  = module.gke_clusters["west"].master_auth.cluster_ca_certificate
+  min_replicas     = 1
+  max_replicas     = 5
+  image            = "sevenajay/mario:latest"
+  config_cluster   = local.clusters.west.config_cluster
+  providers = {
+    kubernetes = kubernetes.west
+    helm       = helm.west
+  }
 }
 
 # Cleanup dynamically created firewall rules for GKE clusters
