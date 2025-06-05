@@ -182,6 +182,9 @@ module "k8s-mario-west" {
 resource "terraform_data" "gke_fw_cleanup" {
   triggers_replace = {
     project_id = var.project_id
+    central_cluster = module.prod-central-cluster.cluster_name
+    west_cluster = module.prod-west-cluster.cluster_name
+    east_cluster = module.prod-east-cluster.cluster_name
   }
 
   provisioner "local-exec" {
