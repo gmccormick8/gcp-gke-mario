@@ -2,42 +2,42 @@ locals {
   clusters = {
     east = {
       # GKE cluster config
-      cluster_name           = "east-cluster"
+      cluster_name          = "east-cluster"
       region                = "us-east5"
       zone                  = "us-east5-c"
       subnet_key            = "prod-east-vpc"
       pods_network_name     = "prod-east-pods"
       services_network_name = "prod-east-services"
-      master_ipv4_cidr     = "172.16.0.0/28"
-      
+      master_ipv4_cidr      = "172.16.0.0/28"
+
       # K8s deployment config
-      config_cluster       = false
+      config_cluster = false
     }
     central = {
       # GKE cluster config
-      cluster_name           = "central-cluster"
+      cluster_name          = "central-cluster"
       region                = "us-central1"
       zone                  = "us-central1-c"
       subnet_key            = "prod-central-vpc"
       pods_network_name     = "prod-central-pods"
       services_network_name = "prod-central-services"
-      master_ipv4_cidr     = "172.16.1.0/28"
-      
+      master_ipv4_cidr      = "172.16.1.0/28"
+
       # K8s deployment config
-      config_cluster       = true
+      config_cluster = true
     }
     west = {
       # GKE cluster config
-      cluster_name           = "west-cluster"
+      cluster_name          = "west-cluster"
       region                = "us-west4"
       zone                  = "us-west4-c"
       subnet_key            = "prod-west-vpc"
       pods_network_name     = "prod-west-pods"
       services_network_name = "prod-west-services"
-      master_ipv4_cidr     = "172.16.2.0/28"
-      
+      master_ipv4_cidr      = "172.16.2.0/28"
+
       # K8s deployment config
-      config_cluster       = false
+      config_cluster = false
     }
   }
 }
@@ -116,22 +116,22 @@ module "gke_clusters" {
 
 # Configure GKE Hub and enable Multi-Cluster Services (MCS)
 resource "google_gke_hub_feature" "mcs" {
-  name     = "multiclusterservicediscovery"
-  project  = var.project_id
-  location = "global"
+  name          = "multiclusterservicediscovery"
+  project       = var.project_id
+  location      = "global"
   force_destroy = true
 
   depends_on = [
-    module.gke_clusters
+    module.gke_clusters,
     terraform_data.fleet_membership_cleanup
   ]
 }
 
 # Register clusters with GKE Hub and enable Multi-Cluster Ingress (MCI)
 resource "google_gke_hub_feature" "mci" {
-  name     = "multiclusteringress"
-  project  = var.project_id
-  location = "global"
+  name          = "multiclusteringress"
+  project       = var.project_id
+  location      = "global"
   force_destroy = true
 
   spec {
@@ -174,8 +174,8 @@ module "k8s-mario" {
 # Cleanup dynamically created firewall rules for GKE clusters
 resource "terraform_data" "gke_fw_cleanup" {
   triggers_replace = {
-    project_id      = var.project_id
-    clusters       = join(",", [for k, v in local.clusters : v.cluster_name])
+    project_id = var.project_id
+    clusters   = join(",", [for k, v in local.clusters : v.cluster_name])
   }
 
   provisioner "local-exec" {

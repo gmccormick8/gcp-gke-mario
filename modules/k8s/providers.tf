@@ -4,12 +4,12 @@ terraform {
   required_providers {
     kubernetes = {
       source                = "hashicorp/kubernetes"
-      version              = "~> 2.30"
+      version               = "~> 2.30"
       configuration_aliases = [kubernetes]
     }
     helm = {
       source                = "hashicorp/helm"
-      version              = "~> 2.10"
+      version               = "~> 2.10"
       configuration_aliases = [helm]
     }
     time = {
