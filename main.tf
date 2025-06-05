@@ -160,8 +160,8 @@ module "k8s-mario" {
   image            = "sevenajay/mario:latest"
   config_cluster   = each.value.config_cluster
   providers = {
-    kubernetes = "kubernetes.${each.key}"
-    helm       = "helm.${each.key}"
+    kubernetes = kubernetes.${each.key}
+    helm       = helm.${each.key}
   }
 
   depends_on = [
