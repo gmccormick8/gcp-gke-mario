@@ -10,6 +10,7 @@ echo -e 'project_id = "'"$DEVSHELL_PROJECT_ID"'"\npublic_ip = "'"$(curl -s ifcon
 
 api_array=(
   "compute.googleapis.com"
+  "cloudresourcemanager.googleapis.com"
   "container.googleapis.com"
   "iam.googleapis.com"
   "gkehub.googleapis.com"
