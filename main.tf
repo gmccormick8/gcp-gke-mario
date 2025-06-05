@@ -195,7 +195,6 @@ resource "terraform_data" "gke_fw_cleanup" {
         for RULE in $RULES; do
           echo "Deleting firewall rule: $RULE"
           gcloud compute firewall-rules delete $RULE --project=${self.triggers_replace.project_id} --quiet
-      else
         done
       else
         echo "No matching firewall rules found to delete"
