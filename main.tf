@@ -112,6 +112,7 @@ module "gke_clusters" {
   machine_type           = "e2-small"
   disk_size_gb           = 25
   disk_type              = "pd-standard"
+  environment            = "production"
 
   depends_on = [
     module.prod-vpc

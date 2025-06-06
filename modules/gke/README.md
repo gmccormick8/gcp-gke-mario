@@ -53,6 +53,7 @@ module "gke_cluster" {
   pods_network_name     = "pods"
   services_network_name = "services"
   public_ip             = "35.35.35.35"
+  environment           = "production"
 }
 ```
 
@@ -116,6 +117,7 @@ module "gke_cluster" {
 
 | Name           | Description            | Type   | Default       |
 | -------------- | ---------------------- | ------ | ------------- |
+| environment    | Environment label      | string | "development" |
 | min_node_count | Minimum nodes per zone | number | 1             |
 | max_node_count | Maximum nodes per zone | number | 2             |
 | machine_type   | Node pool machine type | string | "e2-small"    |

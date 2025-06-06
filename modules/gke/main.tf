@@ -35,6 +35,8 @@ resource "google_container_cluster" "primary" {
   remove_default_node_pool = true
   initial_node_count       = 1
 
+  enable_intranode_visibility = true
+
   ip_allocation_policy {
     cluster_secondary_range_name  = var.pods_network_name
     services_secondary_range_name = var.services_network_name
@@ -74,12 +76,21 @@ resource "google_container_cluster" "primary" {
     }
   }
 
+  network_policy {
+    enabled = true
+  }
+
   binary_authorization {
     evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
   }
 
   release_channel {
     channel = "REGULAR"
+  }
+
+  resource_labels = {
+    "k8s-cluster" = var.cluster_name
+    "environment" = var.environment
   }
 }
 
@@ -109,6 +120,10 @@ resource "google_container_node_pool" "primary_nodes" {
     shielded_instance_config {
       enable_secure_boot          = true
       enable_integrity_monitoring = true
+    }
+
+    workload_metadata_config {
+      mode = "GKE_METADATA_SERVER"
     }
   }
 
