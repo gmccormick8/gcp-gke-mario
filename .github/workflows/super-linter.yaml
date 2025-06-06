@@ -1,0 +1,45 @@
+# This workflow executes several linters on changed files based on languages used in your code base whenever
+# you push a code or open a pull request.
+#
+# You can adjust the behavior by modifying this file.
+# For more information, see:
+# https://github.com/github/super-linter
+name: Run Super Linter
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      statuses: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Lint Code Base
+        uses: github/super-linter@v7
+        env:
+          VALIDATE_ALL_CODEBASE: true
+          # Had to disable Terrascan as it does not support Terraform v1.3.0 features  
+          # Specifically, it doesn't support optional object type with defaults
+          VALIDATE_TERRAFORM_TERRASCAN: false
+          FIX_MARKDOWN: true
+          FIX_SHELL_SHFMT: true
+          FIX_TERRAFORM_FMT: true
+          IGNORE_GITIGNORED_FILES: true
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
