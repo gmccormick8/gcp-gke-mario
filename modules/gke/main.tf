@@ -58,6 +58,16 @@ resource "google_container_cluster" "primary" {
     workload_pool = "${var.project_id}.svc.id.goog"
   }
 
+  authenticator_groups_config {
+    security_group = "gke-security-groups@${var.project_id}.iam.gserviceaccount.com"
+  }
+
+  master_auth {
+    client_certificate_config {
+      issue_client_certificate = false
+    }
+  }
+
   private_cluster_config {
     enable_private_nodes    = true
     enable_private_endpoint = false
@@ -123,7 +133,7 @@ resource "google_container_node_pool" "primary_nodes" {
     }
 
     workload_metadata_config {
-      mode = "GKE_METADATA_SERVER"
+      mode = "GKE_METADATA"
     }
   }
 
