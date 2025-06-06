@@ -29,4 +29,3 @@ autoscaling:
 
 gateway:
   enable: false
-...

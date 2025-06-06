@@ -37,7 +37,7 @@ jobs:
           VALIDATE_ALL_CODEBASE: true
           # Had to disable Terrascan as it does not support Terraform v1.3.0 features  
           # Specifically, it doesn't support optional object type with defaults
-          VALIDATE_TERRAFORM_TERRASCAN: false
+          # VALIDATE_TERRAFORM_TERRASCAN: false
           FIX_MARKDOWN: true
           FIX_SHELL_SHFMT: true
           FIX_TERRAFORM_FMT: true

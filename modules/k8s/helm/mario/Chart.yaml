@@ -4,4 +4,3 @@ name: mario
 description: A Helm chart for Super Mario deployment
 version: 0.1.0
 type: application
-...

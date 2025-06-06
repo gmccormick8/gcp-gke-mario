@@ -4,4 +4,3 @@ kind: ServiceExport
 metadata:
   name: mario-service
   namespace: mario
-...
