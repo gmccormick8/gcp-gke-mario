@@ -139,7 +139,7 @@ resource "google_gke_hub_feature" "mci" {
   }
 
   depends_on = [
-    module.gke_clusters,
+    module.gke_clusters["central"],
     terraform_data.fleet_membership_cleanup
   ]
 }
@@ -160,6 +160,12 @@ module "k8s-mario-east" {
     kubernetes = kubernetes.east
     helm       = helm.east
   }
+
+  depends_on = [
+    module.gke_clusters["east"],
+    google_gke_hub_feature.mcs,
+    google_gke_hub_feature.mci
+  ]
 }
 
 # Deploy Mario application to the central GKE cluster
@@ -178,6 +184,12 @@ module "k8s-mario-central" {
     kubernetes = kubernetes.central
     helm       = helm.central
   }
+
+  depends_on = [
+    module.gke_clusters["central"],
+    google_gke_hub_feature.mcs,
+    google_gke_hub_feature.mci
+  ]
 }
 
 # Deploy Mario application to the west GKE cluster
@@ -196,6 +208,12 @@ module "k8s-mario-west" {
     kubernetes = kubernetes.west
     helm       = helm.west
   }
+
+  depends_on = [
+    module.gke_clusters["west"],
+    google_gke_hub_feature.mcs,
+    google_gke_hub_feature.mci
+  ]
 }
 
 # Cleanup dynamically created firewall rules for GKE clusters
