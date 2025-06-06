@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: mario-service
   namespace: mario
+  annotations:
+    networking.gke.io/max-rate-per-endpoint: "20"
   labels:
     app: mario
 spec:

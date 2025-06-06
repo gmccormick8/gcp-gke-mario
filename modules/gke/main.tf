@@ -67,9 +67,9 @@ resource "google_container_cluster" "primary" {
   # 2. A single whitelisted IP (for direct kubectl access)
   # This provides secure control plane access without requiring a bastion host
   master_authorized_networks_config {
-    gcp_public_cidrs_access_enabled = true  # Allow Google Compute Engine Public IPs
+    gcp_public_cidrs_access_enabled = true # Allow Google Compute Engine Public IPs
     cidr_blocks {
-      cidr_block   = "${var.public_ip}/32"  # Allow single whitelisted IP
+      cidr_block   = "${var.public_ip}/32" # Allow single whitelisted IP
       display_name = "allow-current-host"
     }
   }

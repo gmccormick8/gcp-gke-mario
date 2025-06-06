@@ -110,7 +110,7 @@ if [[ "$response" == "y" ]]; then
   fi
   echo "Terraform apply completed successfully."
   echo "Mario game will be available at: $(terraform output -raw mario_gateway_url)"
-  echo "Note: It may take a few minutes for the load balancer to be fully provisioned."
+  echo "Note: It may take up to 10 minutes for the load balancer to be fully provisioned."
 else
   echo "Apply canceled."
 fi

@@ -23,6 +23,9 @@ This project provides Infrastructure as Code (IaC) for deploying a highly-availa
 - **Application Platform**
   - Super Mario browser game deployment
   - Global load balancer for optimal routing
+  - Rate limiting (20 RPS per endpoint)
+  - Maximum cluster capacity: 100 RPS
+  - Total platform capacity: 300 RPS
   - Automatic failover between regions
   - Geographic-based request routing
   - Helm-based deployment automation

@@ -85,6 +85,26 @@ resources:
     ephemeral-storage: 2Gi
 ```
 
+### Rate Limiting
+
+```yaml
+annotations:
+  networking.gke.io/max-rate-per-endpoint: "20" # 20 RPS per pod
+```
+
+Max capacity:
+
+- Single pod: 20 RPS
+- Per cluster: 100 RPS (at max 5 pods)
+- Multi-cluster: 300 RPS (across 3 regions)
+
+The RPS limit is set conservatively to:
+
+- Ensure stable pod performance
+- Allow headroom for traffic spikes
+- Match CPU resource allocation (500m)
+- Support efficient auto-scaling
+
 ### Autoscaling Configuration
 
 ```yaml
