@@ -9,17 +9,17 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: mario
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  minReplicas: {{ .Values.autoscaling.min }}
+  maxReplicas: {{ .Values.autoscaling.max }}
   metrics:
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: {{ .Values.autoscaling.cpuUtilization }}
+          averageUtilization: {{ .Values.autoscaling.cpu }}
   behavior:
     scaleUp:
-      stabilizationWindowSeconds: {{ .Values.autoscaling.scaleUpStabilization }}
+      stabilizationWindowSeconds: {{ .Values.autoscaling.upStab }}
     scaleDown:
-      stabilizationWindowSeconds: {{ .Values.autoscaling.scaleDownStabilization }}
+      stabilizationWindowSeconds: {{ .Values.autoscaling.downStab }}
