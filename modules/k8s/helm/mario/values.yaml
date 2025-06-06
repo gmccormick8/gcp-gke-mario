@@ -1,3 +1,4 @@
+---
 # Default values for Mario Helm chart.
 image:
   repository: sevenajay/mario
@@ -28,3 +29,4 @@ autoscaling:
 
 gateway:
   enable: false
+...

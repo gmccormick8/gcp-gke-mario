@@ -1,3 +1,4 @@
+---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -22,3 +23,4 @@ spec:
       stabilizationWindowSeconds: {{.Values.autoscaling.scaleUpStabilization}}
     scaleDown:
       stabilizationWindowSeconds: {{.Values.autoscaling.scaleDownStabilization}}
+...

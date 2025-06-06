@@ -1,5 +1,7 @@
+---
 apiVersion: net.gke.io/v1
 kind: ServiceExport
 metadata:
   name: mario-service
   namespace: mario
+...

@@ -63,14 +63,14 @@ module "gke_cluster" {
   source = "./modules/gke"
 
   project_id             = "my-project"
-  cluster_name          = "prod-cluster"
-  zone                  = "us-central1-a"
+  cluster_name          = "demo-cluster"
+  zone                  = "us-east1-a"
   network_name          = module.vpc.network_self_link
-  subnet_name           = module.vpc.subnets["my-subnet"].self_link
-  master_ipv4_cidr_block = "172.16.0.0/28"
+  subnet_name           = module.vpc.subnets["demo-subnet"].self_link
+  master_ipv4_cidr_block = "172.16.1.0/28"
   pods_network_name     = "pods"
   services_network_name = "services"
-  public_ip             = "35.35.35.35"
+  public_ip             = "35.35.35.36"
 
   # Node pool customization
   min_node_count = 2
