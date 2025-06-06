@@ -1,9 +1,23 @@
 #!/bin/bash
 # This script sets up the environment for Cloud Shell and applies the Terraform script.
-#usage: bash setup.sh
+#usage: bash setup.sh [-y] or ./setup.sh [-y]
 
 # Exit immediately if a command exits with a non-zero status. 
 set -e
+
+# Parse command line arguments
+auto_approve=false
+while getopts ":y" opt; do
+  case ${opt} in
+    y)
+      auto_approve=true
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG. USAGE: bash setup.sh [-y] or ./setup.sh [-y]" 1>&2
+      exit 1
+      ;;
+  esac
+done
 
 echo "Setting up the environment..."
 echo -e 'project_id = "'"$DEVSHELL_PROJECT_ID"'"\npublic_ip = "'"$(curl -s ifconfig.me)"'"' > terraform.tfvars
@@ -44,7 +58,11 @@ for i in "${!xarr[@]}"; do
 done
 
 if [[ $current == false ]]; then
-  read -rp "Terraform version is less than 1.11.0. Do you want to update it? (y/n) " update_response
+  if [[ "$auto_approve" == true ]]; then
+    update_response="y"
+  else
+    read -rp "Terraform version is less than 1.11.0. Do you want to update it? (y/n) " update_response
+  fi
   if [[ "$update_response" != "y" ]]; then
     echo "Exiting without updating Terraform."
     exit 1
@@ -77,7 +95,11 @@ if ! terraform plan; then
   exit 1
 fi
 
-read -rp "Do you want to apply the changes? (y/n) " response
+if [[ "$auto_approve" == true ]]; then
+  response="y"
+else
+  read -rp "Do you want to apply the changes? (y/n) " response
+fi
 if [[ "$response" == "y" ]]; then
   if ! terraform apply --auto-approve; then
     echo "Error during apply. Exiting..."
