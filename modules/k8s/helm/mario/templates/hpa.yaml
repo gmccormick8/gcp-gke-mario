@@ -9,8 +9,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: mario
-  minReplicas: {{ .Values.autoscaling.min | default 1 }}
-  maxReplicas: {{ .Values.autoscaling.max | default 5 }}
+  minReplicas: "{{ .Values.autoscaling.min | default 1 }}"
+  maxReplicas: "{{ .Values.autoscaling.max | default 5 }}"
   metrics:
     - type: Resource
       resource:
