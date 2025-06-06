@@ -157,7 +157,7 @@ module "k8s-mario-east" {
   cluster_ca_cert  = module.gke_clusters["east"].master_auth.cluster_ca_certificate
   min_replicas     = 1
   max_replicas     = 5
-  image            = "sevenajay/mario:latest"
+  image            = "sevenajay/mario@sha256:8541a39162f3"
   config_cluster   = local.clusters.east.config_cluster
   providers = {
     kubernetes = kubernetes.east
@@ -179,7 +179,7 @@ module "k8s-mario-central" {
   cluster_ca_cert  = module.gke_clusters["central"].master_auth.cluster_ca_certificate
   min_replicas     = 1
   max_replicas     = 5
-  image            = "sevenajay/mario:latest"
+  image            = "sevenajay/mario@sha256:8541a39162f3"
   config_cluster   = local.clusters.central.config_cluster
   providers = {
     kubernetes = kubernetes.central
@@ -201,7 +201,7 @@ module "k8s-mario-west" {
   cluster_ca_cert  = module.gke_clusters["west"].master_auth.cluster_ca_certificate
   min_replicas     = 1
   max_replicas     = 5
-  image            = "sevenajay/mario:latest"
+  image            = "sevenajay/mario@sha256:8541a39162f3"
   config_cluster   = local.clusters.west.config_cluster
   providers = {
     kubernetes = kubernetes.west

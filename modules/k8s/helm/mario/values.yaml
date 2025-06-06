@@ -1,9 +1,9 @@
 ---
 # Default values for Mario Helm chart.
 image:
-  repository: sevenajay/mario
-  tag: latest
-  pullPolicy: IfNotPresent
+  repository: sevenajay/mario@sha256
+  tag: 8541a39162f3
+  pullPolicy: Always
 
 resources:
   limits:
