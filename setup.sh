@@ -7,17 +7,20 @@ set -e
 
 # Parse command line arguments
 auto_approve=false
-while getopts ":y" opt; do
-  case ${opt} in
-    y)
-      auto_approve=true
-      ;;
-    \?)
-      echo "Invalid option: -$OPTARG. USAGE: bash setup.sh [-y] or ./setup.sh [-y]" 1>&2
-      exit 1
-      ;;
-  esac
-done
+
+# Check if there are any arguments
+if [ $# -gt 1 ]; then
+    echo "Invalid option. USAGE: bash setup.sh [-y] or ./setup.sh [-y]" 1>&2
+    exit 1
+fi
+
+if [ $# -eq 1 ]; then
+    if [ "$1" != "-y" ]; then
+        echo "Invalid option. USAGE: bash setup.sh [-y] or ./setup.sh [-y]" 1>&2
+        exit 1
+    fi
+    auto_approve=true
+fi
 
 echo "Setting up the environment..."
 echo -e 'project_id = "'"$DEVSHELL_PROJECT_ID"'"\npublic_ip = "'"$(curl -s ifconfig.me)"'"' > terraform.tfvars
