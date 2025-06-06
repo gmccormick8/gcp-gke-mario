@@ -1,6 +1,6 @@
 # GCP GKE Mario
 
-[![Run Super Linter](https://github.com/gmccormick8/gcp-gke-mario/actions/workflows/super-linter.yml/badge.svg?branch=main)](https://github.com/gmccormick8/gcp-gke-mario/actions/workflows/super-linter.yml)
+[![Run Super Linter](https://github.com/gmccormick8/gcp-gke-mario/actions/workflows/super-linter.yaml/badge.svg)](https://github.com/gmccormick8/gcp-gke-mario/actions/workflows/super-linter.yaml)
 
 This project provides Infrastructure as Code (IaC) for deploying a highly-available browser-based Super Mario Web App leveraging modern cloud-native patterns including multi-cluster load balancing, Gateway API, and automated scaling. 
 This project uses Zonal Google Kubernetes Engine (GKE) clusters, Helm charts, Multi-Cluster Services (MCS), and as well as a Global External Application Load Balancer across all clusters. 
