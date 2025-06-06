@@ -147,9 +147,9 @@ resource "google_gke_hub_feature" "mci" {
 # Deploy Mario application to the east GKE cluster
 module "k8s-mario-east" {
   source           = "./modules/k8s"
-  project_id       = var.project_id
+  #project_id       = var.project_id
   cluster_name     = module.gke_clusters["east"].cluster_name
-  cluster_location = module.gke_clusters["east"].cluster_location
+  #cluster_location = module.gke_clusters["east"].cluster_location
   cluster_endpoint = module.gke_clusters["east"].cluster_endpoint
   cluster_ca_cert  = module.gke_clusters["east"].master_auth.cluster_ca_certificate
   min_replicas     = 1
@@ -171,9 +171,9 @@ module "k8s-mario-east" {
 # Deploy Mario application to the central GKE cluster
 module "k8s-mario-central" {
   source           = "./modules/k8s"
-  project_id       = var.project_id
+  #project_id       = var.project_id
   cluster_name     = module.gke_clusters["central"].cluster_name
-  cluster_location = module.gke_clusters["central"].cluster_location
+  #cluster_location = module.gke_clusters["central"].cluster_location
   cluster_endpoint = module.gke_clusters["central"].cluster_endpoint
   cluster_ca_cert  = module.gke_clusters["central"].master_auth.cluster_ca_certificate
   min_replicas     = 1
@@ -195,9 +195,9 @@ module "k8s-mario-central" {
 # Deploy Mario application to the west GKE cluster
 module "k8s-mario-west" {
   source           = "./modules/k8s"
-  project_id       = var.project_id
+  #project_id       = var.project_id
   cluster_name     = module.gke_clusters["west"].cluster_name
-  cluster_location = module.gke_clusters["west"].cluster_location
+  #cluster_location = module.gke_clusters["west"].cluster_location
   cluster_endpoint = module.gke_clusters["west"].cluster_endpoint
   cluster_ca_cert  = module.gke_clusters["west"].master_auth.cluster_ca_certificate
   min_replicas     = 1
