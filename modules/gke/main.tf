@@ -21,6 +21,7 @@ resource "google_project_iam_member" "gke_sa_container_admin_role" {
   member  = "serviceAccount:${google_service_account.gke_sa.email}"
 }
 
+# Create a Standard GKE cluster
 resource "google_container_cluster" "primary" {
   name     = var.cluster_name
   location = var.zone
@@ -61,10 +62,14 @@ resource "google_container_cluster" "primary" {
     master_ipv4_cidr_block  = var.master_ipv4_cidr_block
   }
 
+  # Configure master authorized networks to only allow:
+  # 1. Google Compute Engine Public IPs (for Cloud Shell and Console access)
+  # 2. A single whitelisted IP (for direct kubectl access)
+  # This provides secure control plane access without requiring a bastion host
   master_authorized_networks_config {
-    gcp_public_cidrs_access_enabled = true
+    gcp_public_cidrs_access_enabled = true  # Allow Google Compute Engine Public IPs
     cidr_blocks {
-      cidr_block   = "${var.public_ip}/32"
+      cidr_block   = "${var.public_ip}/32"  # Allow single whitelisted IP
       display_name = "allow-current-host"
     }
   }
@@ -78,6 +83,7 @@ resource "google_container_cluster" "primary" {
   }
 }
 
+# Create a node pool for the GKE cluster
 resource "google_container_node_pool" "primary_nodes" {
   name     = "${var.cluster_name}-node-pool"
   location = var.zone

@@ -15,18 +15,8 @@ variable "max_replicas" {
   default     = 5
 }
 
-variable "project_id" {
-  description = "The GCP project ID"
-  type        = string
-}
-
 variable "cluster_name" {
   description = "The name of the cluster"
-  type        = string
-}
-
-variable "cluster_location" {
-  description = "The location of the cluster"
   type        = string
 }
 

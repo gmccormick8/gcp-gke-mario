@@ -1,21 +1,44 @@
-# Google Kubernetes Engine Module
+# GKE Cluster Module for Multi-Region Infrastructure
 
-This module creates a secure, production-ready GKE cluster with private nodes, workload identity, and Gateway API support.
+Creates a GKE cluster with Gateway API support, private nodes, and multi-cluster capabilities.
 
 ## Features
 
-- Private GKE cluster with public control plane
-- Workload identity enabled
-- Custom service account with least privilege
-- Gateway API support
-- Binary authorization
-- Auto-scaling node pool
-- Auto-upgrade and auto-repair enabled
-- Shielded nodes with secure boot
-- VPC-native networking
-- Regular release channel
+- **Private Infrastructure**
+
+  - Private nodes with public control plane access restricted to:
+    - Google Compute Engine Public IPs (for Cloud Shell and Google Cloud Console access)
+    - A single whitelisted IP specified via public_ip variable (for direct kubectl access)
+  - No bastion host required for secure control plane access
+  - VPC-native networking
+  - Cloud NAT for egress
+  - IAP tunnel access
+
+- **Security**
+
+  - Workload identity enabled
+  - Shielded nodes with secure boot
+  - Binary authorization
+  - Minimal IAM permissions
+  - Private nodes only
+
+- **Reliability**
+
+  - Auto-scaling node pool
+  - Auto-upgrade enabled
+  - Auto-repair enabled
+  - Regular release channel
+  - Rolling updates
+
+- **Gateway API**
+  - Standard channel enabled
+  - Multi-cluster support
+  - Fleet registration
+  - Global load balancing ready
 
 ## Usage
+
+Basic example:
 
 ```hcl
 module "gke_cluster" {
@@ -24,122 +47,182 @@ module "gke_cluster" {
   project_id             = "my-project"
   cluster_name          = "prod-cluster"
   zone                  = "us-central1-a"
-  network_name          = "vpc-network-self-link"
-  subnet_name           = "subnet-self-link"
-  pods_network_name     = "pods-range-name"
-  services_network_name = "services-range-name"
+  network_name          = module.vpc.network_self_link
+  subnet_name           = module.vpc.subnets["my-subnet"].self_link
   master_ipv4_cidr_block = "172.16.0.0/28"
+  pods_network_name     = "pods"
+  services_network_name = "services"
   public_ip             = "35.35.35.35"
-
-  # Optional configurations
-  min_node_count = 1
-  max_node_count = 5
-  machine_type   = "e2-standard-2"
-  disk_size_gb   = 50
-  disk_type      = "pd-standard"
 }
 ```
 
-## Prerequisites
+Advanced example with customizations:
+
+```hcl
+module "gke_cluster" {
+  source = "./modules/gke"
+
+  project_id             = "my-project"
+  cluster_name          = "prod-cluster"
+  zone                  = "us-central1-a"
+  network_name          = module.vpc.network_self_link
+  subnet_name           = module.vpc.subnets["my-subnet"].self_link
+  master_ipv4_cidr_block = "172.16.0.0/28"
+  pods_network_name     = "pods"
+  services_network_name = "services"
+  public_ip             = "35.35.35.35"
+
+  # Node pool customization
+  min_node_count = 2
+  max_node_count = 10
+  machine_type   = "e2-standard-4"
+  disk_size_gb   = 100
+  disk_type      = "pd-ssd"
+}
+```
+
+## Requirements
 
 - Terraform ~> 1.11
 - Google Provider ~> 6.30
-- Required APIs enabled:
-  - container.googleapis.com
-  - containerregistry.googleapis.com
+- Google Beta Provider ~> 6.30
+- APIs enabled:
   - compute.googleapis.com
-  - iam.googleapis.com
+  - container.googleapis.com
   - gkehub.googleapis.com
+  - cloudresourcemanager.googleapis.com
+  - trafficdirector.googleapis.com
+  - multiclusterservicediscovery.googleapis.com
+  - multiclusteringress.googleapis.com
+  - anthos.googleapis.com
 
-## Module Variables
+## Variables
 
-| Name                   | Description                       | Type   | Default       | Required |
-| ---------------------- | --------------------------------- | ------ | ------------- | :------: |
-| project_id             | GCP Project ID                    | string | -             |   yes    |
-| cluster_name           | Name of the GKE cluster           | string | -             |   yes    |
-| zone                   | Zone to host the cluster          | string | -             |   yes    |
-| network_name           | VPC network self-link             | string | -             |   yes    |
-| subnet_name            | Subnet self-link                  | string | -             |   yes    |
-| master_ipv4_cidr_block | Control plane IP CIDR             | string | -             |   yes    |
-| pods_network_name      | Secondary range name for pods     | string | -             |   yes    |
-| services_network_name  | Secondary range name for services | string | -             |   yes    |
-| public_ip              | Authorized network IP             | string | -             |   yes    |
-| min_node_count         | Minimum nodes per zone            | number | 1             |    no    |
-| max_node_count         | Maximum nodes per zone            | number | 2             |    no    |
-| machine_type           | Node pool machine type            | string | "e2-small"    |    no    |
-| disk_size_gb           | Node disk size in GB              | number | 25            |    no    |
-| disk_type              | Node disk type                    | string | "pd-standard" |    no    |
+### Required
 
-## Security Features
+| Name                   | Description                  | Type   |
+| ---------------------- | ---------------------------- | ------ |
+| project_id             | GCP Project ID               | string |
+| cluster_name           | Name for GKE cluster         | string |
+| zone                   | Zone to host the cluster     | string |
+| network_name           | VPC network self-link        | string |
+| subnet_name            | Subnet self-link             | string |
+| master_ipv4_cidr_block | Control plane CIDR           | string |
+| pods_network_name      | Secondary range for pods     | string |
+| services_network_name  | Secondary range for services | string |
+| public_ip              | Authorized network IP        | string |
 
-### Node Security
+### Optional
 
-- Shielded nodes enabled
-- Secure boot enforced
-- Integrity monitoring enabled
-- Private nodes only
-- Workload identity for pod authentication
-
-### Network Security
-
-- Private cluster architecture
-- Authorized networks configuration
-- VPC-native networking
-- Master authorized networks
-
-### Access Control
-
-- Dedicated service account with minimal IAM roles:
-  - container.nodeServiceAgent
-  - compute.networkViewer
-  - container.admin
-
-## Node Pool Configuration
-
-The default node pool is configured with:
-
-- Auto-scaling (configurable min/max)
-- Auto-upgrade enabled
-- Auto-repair enabled
-- Secure boot
-- OAuth scopes limited to cloud-platform
-- Private nodes only
-- Rolling updates (max surge: 1, max unavailable: 1)
+| Name           | Description            | Type   | Default       |
+| -------------- | ---------------------- | ------ | ------------- |
+| min_node_count | Minimum nodes per zone | number | 1             |
+| max_node_count | Maximum nodes per zone | number | 2             |
+| machine_type   | Node pool machine type | string | "e2-small"    |
+| disk_size_gb   | Node disk size in GB   | number | 25            |
+| disk_type      | Node disk type         | string | "pd-standard" |
 
 ## Outputs
 
-| Name             | Description                        |
-| ---------------- | ---------------------------------- |
-| cluster_id       | Full ID of the GKE cluster         |
-| cluster_name     | Name of the cluster                |
-| cluster_location | Location of the cluster            |
-| cluster_endpoint | Cluster control plane endpoint     |
-| master_auth      | Cluster CA certificate (sensitive) |
+| Name             | Description                |
+| ---------------- | -------------------------- |
+| cluster_id       | Full cluster ID            |
+| cluster_name     | Cluster name               |
+| cluster_location | Cluster location           |
+| cluster_endpoint | Control plane endpoint     |
+| master_auth      | CA certificate (sensitive) |
 
-## Fleet Registration
+## Node Pool Configuration
 
-The cluster is automatically registered to your GKE fleet, enabling:
+Default node pool settings:
 
-- Multi-cluster management
-- Fleet-wide policies
-- Anthos features (if enabled)
-- Gateway API support
+```yaml
+autoscaling:
+  min_count: 1
+  max_count: 2
+
+node_config:
+  machine_type: e2-small
+  disk_size_gb: 25
+  disk_type: pd-standard
+  oauth_scopes:
+    - cloud-platform
+
+security:
+  secure_boot: true
+  integrity_monitoring: true
+  private_nodes: true
+
+management:
+  auto_upgrade: true
+  auto_repair: true
+  surge_upgrade: true
+```
+
+## IAM Roles
+
+Service account permissions:
+
+- roles/container.nodeServiceAgent
+- roles/compute.networkViewer
+- roles/container.admin
+
+## Best Practices Implemented
+
+1. Network Security
+
+   - Use private nodes
+   - Enable master authorized networks (limited to Google Compute Engine Public IPs and an IP that can be spcified when the module is called)
+   - Configure Cloud NAT for egress
+
+2. Node Security
+
+   - Enable Workload Identity
+   - Use shielded nodes
+   - Enable secure boot
+   - Minimize OAuth scopes
+
+3. Operational Excellence
+   - Enable auto-upgrade
+   - Enable auto-repair
+   - Configure suitable node counts
+   - Use rolling updates
 
 ## Limitations
 
-- Single zone cluster (for multi-zone, adjust the location)
-- Public control plane endpoint
+- Single zone only
+- Public control plane
+- One node pool
 - Standard release channel only
-- Single node pool
 
-## Notes
+## Troubleshooting
 
-- Initial cluster creation takes ~10-15 minutes
-- Node pool auto-upgrade occurs during maintenance window
-- Binary authorization defaults to project policy
-- Workload identity uses default GCP project format
-- Gateway API enabled with CHANNEL_STANDARD
+Common issues and solutions:
+
+1. Control Plane Access
+
+```bash
+# Test connectivity
+gcloud container clusters get-credentials CLUSTER_NAME --zone ZONE
+kubectl cluster-info
+```
+
+2. Node Pool Issues
+
+```bash
+# Check node status
+kubectl get nodes
+kubectl describe node NODE_NAME
+```
+
+3. Workload Identity
+
+```bash
+# Verify configuration
+kubectl describe serviceaccount SERVICEACCOUNT_NAME
+gcloud container clusters describe CLUSTER_NAME
+```
 
 ## License
 
-This module is licensed under the GNU General Public License v3.0
+GNU General Public License v3.0
