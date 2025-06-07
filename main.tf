@@ -244,11 +244,13 @@ resource "terraform_data" "fleet_membership_cleanup" {
   provisioner "local-exec" {
     when    = destroy
     command = <<EOT
-      echo "Unregistering clusters from fleet..."
-      gcloud container fleet memberships delete east-cluster central-cluster west-cluster \
-        --project=${self.triggers_replace.project_id} \
-        --location=global \
-        --quiet || true
+      for region in east central west; do
+        echo "Unregistering cluster: $region-cluster"
+        gcloud container fleet memberships delete $region-cluster \
+          --project=${self.triggers_replace.project_id} \
+          --location=global \
+          --quiet || true
+      done
     EOT
   }
 
