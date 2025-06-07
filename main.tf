@@ -89,9 +89,7 @@ module "prod-vpc" {
 
   cloud_nat_configs = ["us-east5", "us-central1", "us-west4"]
 
-  depends_on = [
-    terraform_data.gke_fw_cleanup
-  ]
+  depends_on = []
 }
 
 module "gke_clusters" {
@@ -126,8 +124,7 @@ resource "google_gke_hub_feature" "mcs" {
   location = "global"
 
   depends_on = [
-    module.gke_clusters,
-    terraform_data.fleet_membership_cleanup
+    module.gke_clusters
   ]
 }
 
@@ -144,8 +141,7 @@ resource "google_gke_hub_feature" "mci" {
   }
 
   depends_on = [
-    module.gke_clusters["central"],
-    terraform_data.fleet_membership_cleanup
+    module.gke_clusters
   ]
 }
 
@@ -217,41 +213,36 @@ module "k8s-mario-west" {
 
 # Cleanup dynamically created firewall rules for GKE clusters
 resource "terraform_data" "gke_fw_cleanup" {
-  triggers_replace = {
-    project_id = var.project_id
-    clusters   = join(",", [for k, v in local.clusters : v.cluster_name])
-  }
-
   provisioner "local-exec" {
     when    = destroy
     command = <<EOT
-      RULES=$(gcloud compute firewall-rules list --project=${self.triggers_replace.project_id} --filter='name~^gke-.*-.*-[0-9a-f]+-mcsd$' --format='value(name)')
+      RULES=$(gcloud compute firewall-rules list --project=${var.project_id} --filter='name~^gke-.*-.*-[0-9a-f]+-mcsd$' --format='value(name)')
       if [ ! -z "$RULES" ]; then
         for RULE in $RULES; do
           echo "Deleting firewall rule: $RULE"
-          gcloud compute firewall-rules delete $RULE --project=${self.triggers_replace.project_id} --quiet
+          gcloud compute firewall-rules delete $RULE --project=${var.project_id} --quiet
         done
       else
         echo "No matching firewall rules found to delete"
       fi
     EOT
   }
+
+  depends_on = [
+    module.gke_clusters
+  ]
 }
 
 # Cleanup dynamically created fleet memberships
 resource "terraform_data" "fleet_membership_cleanup" {
-  triggers_replace = {
-    project_id = var.project_id
-  }
-
   provisioner "local-exec" {
     when    = destroy
     command = <<EOT
       echo "Unregistering clusters from fleet..."
       for CLUSTER in central east west; do
         gcloud container clusters update "$${CLUSTER}-cluster" \
-          --project=${self.triggers_replace.project_id} \
-          --location=$(gcloud container clusters list --project=${self.triggers_replace.project_id} --filter="name=$${CLUSTER}-cluster" --format="value(location)") \
+          --project=${var.project_id} \
+          --location=$(gcloud container clusters list --project=${var.project_id} --filter="name=$${CLUSTER}-cluster" --format="value(location)") \
           --unregister-fleet \
           --quiet || true
       done
@@ -261,4 +252,10 @@ resource "terraform_data" "fleet_membership_cleanup" {
       sleep 90
     EOT
   }
+
+  depends_on = [
+    module.gke_clusters,
+    google_gke_hub_feature.mcs,
+    google_gke_hub_feature.mci
+  ]
 }
