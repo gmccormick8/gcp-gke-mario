@@ -213,14 +213,18 @@ module "k8s-mario-west" {
 
 # Cleanup dynamically created firewall rules for GKE clusters
 resource "terraform_data" "gke_fw_cleanup" {
+  triggers_replace = {
+    project_id = var.project_id
+  }
+
   provisioner "local-exec" {
     when    = destroy
     command = <<EOT
-      RULES=$(gcloud compute firewall-rules list --project=${var.project_id} --filter='name~^gke-.*-.*-[0-9a-f]+-mcsd$' --format='value(name)')
+      RULES=$(gcloud compute firewall-rules list --project=${self.triggers_replace.project_id} --filter='name~^gke-.*mcsd$' --format='value(name)')
       if [ ! -z "$RULES" ]; then
         for RULE in $RULES; do
           echo "Deleting firewall rule: $RULE"
-          gcloud compute firewall-rules delete $RULE --project=${var.project_id} --quiet
+          gcloud compute firewall-rules delete $RULE --project=${self.triggers_replace.project_id} --quiet
         done
       else
         echo "No matching firewall rules found to delete"
@@ -228,28 +232,23 @@ resource "terraform_data" "gke_fw_cleanup" {
     EOT
   }
 
-  depends_on = [
-    module.gke_clusters
-  ]
+  depends_on = [module.gke_clusters]
 }
 
 # Cleanup dynamically created fleet memberships
 resource "terraform_data" "fleet_membership_cleanup" {
+  triggers_replace = {
+    project_id = var.project_id
+  }
+
   provisioner "local-exec" {
     when    = destroy
     command = <<EOT
       echo "Unregistering clusters from fleet..."
-      for CLUSTER in central east west; do
-        gcloud container clusters update "$${CLUSTER}-cluster" \
-          --project=${var.project_id} \
-          --location=$(gcloud container clusters list --project=${var.project_id} --filter="name=$${CLUSTER}-cluster" --format="value(location)") \
-          --unregister-fleet \
-          --quiet || true
-      done
-
-      # Wait for unregistration to complete
-      echo "Waiting 90 seconds for fleet unregistration to complete..."
-      sleep 90
+      gcloud container fleet memberships delete east-cluster central-cluster west-cluster \
+        --project=${self.triggers_replace.project_id} \
+        --location=global \
+        --quiet || true
     EOT
   }
 
