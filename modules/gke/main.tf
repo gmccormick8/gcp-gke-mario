@@ -58,10 +58,6 @@ resource "google_container_cluster" "primary" {
     workload_pool = "${var.project_id}.svc.id.goog"
   }
 
-  authenticator_groups_config {
-    security_group = "gke-security-groups@${var.project_id}.iam.gserviceaccount.com"
-  }
-
   master_auth {
     client_certificate_config {
       issue_client_certificate = false
