@@ -236,6 +236,12 @@ terraform destroy --auto-approve
 This implementation:
 
 - Has a Public Control Plane (whitelisted IPs, but still Public)
+  - This is intentional and secure for this use case
+  - Access is restricted to:
+    - Google Cloud Shell / Console IPs
+    - A single whitelisted IP for direct access
+  - No bastion host is required
+  - Terrascan rule AC_GCP_0041 is explicitly skipped
 - Uses HTTP (not HTTPS)
 - Is intended for development/testing purposes
 - Is not suitable for production use

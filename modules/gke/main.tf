@@ -21,6 +21,7 @@ resource "google_project_iam_member" "gke_sa_container_admin_role" {
   member  = "serviceAccount:${google_service_account.gke_sa.email}"
 }
 
+#ts:skip=AC_GCP_0041 Control plane exposure is intentional and secured via master authorized networks
 # Create a Standard GKE cluster
 resource "google_container_cluster" "primary" {
   name     = var.cluster_name
