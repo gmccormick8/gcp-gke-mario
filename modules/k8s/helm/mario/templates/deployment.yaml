@@ -23,13 +23,13 @@ spec:
             - containerPort: 80
           resources:
             requests:
-              cpu: "{{ .Values.resources.requests.cpu | default '250m' }}"
-              memory: "{{ .Values.resources.requests.memory | default '512Mi' }}"
-              ephemeral-storage: "{{ .Values.resources.requests.ephemeral-storage | default '2Gi' }}"
+              cpu: {{ .Values.resources.requests.cpu | default "250m" }}
+              memory: {{ .Values.resources.requests.memory | default "512Mi" }}
+              ephemeral-storage: {{ .Values.resources.requests.ephemeral-storage | default "2Gi" }}
             limits:
-              cpu: "{{ .Values.resources.limits.cpu | default '500m' }}"
-              memory: "{{ .Values.resources.limits.memory | default '1000Mi' }}"
-              ephemeral-storage: "{{ .Values.resources.limits.ephemeral-storage | default '4Gi' }}"
+              cpu: {{ .Values.resources.limits.cpu | default "500m" }}
+              memory: {{ .Values.resources.limits.memory | default "1000Mi" }}
+              ephemeral-storage: {{ .Values.resources.limits.ephemeral-storage | default "4Gi" }}
           readinessProbe:
             httpGet:
               path: /
