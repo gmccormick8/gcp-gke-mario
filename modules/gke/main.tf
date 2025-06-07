@@ -23,7 +23,6 @@ resource "google_project_iam_member" "gke_sa_container_admin_role" {
 
 
 # Create a Standard GKE cluster
-#ts:skip=accurics.gcp.NS.109
 resource "google_container_cluster" "primary" {
   name     = var.cluster_name
   location = var.zone
@@ -76,7 +75,7 @@ resource "google_container_cluster" "primary" {
   # 1. Google Compute Engine Public IPs (for Cloud Shell and Console access)
   # 2. A single whitelisted IP (for direct kubectl access)
   # This provides secure control plane access without requiring a bastion host
-  #ts:skip=AC-GC-IS-CC-M-0367
+  #ts:skip=AC_GCP_0292
   master_authorized_networks_config {
     gcp_public_cidrs_access_enabled = true # Allow Google Compute Engine Public IPs
     cidr_blocks {
