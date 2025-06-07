@@ -9,11 +9,11 @@ resources:
   limits:
     cpu: 500m
     memory: 1000Mi
-    ephemeral_storage: 4Gi
+    storage: 4Gi
   requests:
     cpu: 250m
     memory: 512Mi
-    ephemeral_storage: 2Gi
+    storage: 2Gi
 
 service:
   port: 80
