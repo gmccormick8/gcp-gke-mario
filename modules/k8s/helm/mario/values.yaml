@@ -2,7 +2,7 @@
 # Default values for Mario Helm chart.
 image:
   repository: sevenajay/mario
-  digest: sha256:8541a39162f3510821eccb7be96a12ba210e93cefee55e7d3fb159418019116b
+  tag: latest
   pullPolicy: Always
 
 resources:

@@ -14,5 +14,4 @@ spec:
       allowedRoutes:
         kinds:
           - kind: HTTPRoute
-            group: gateway.networking.k8s.io
 {{- end }}
