@@ -107,7 +107,7 @@ module "gke_clusters" {
   public_ip              = var.public_ip
   min_node_count         = 1
   max_node_count         = 3
-  machine_type           = "e2-small"
+  machine_type           = "e2-medium-4"
   disk_size_gb           = 25
   disk_type              = "pd-standard"
   environment            = "production"
