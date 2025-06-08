@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: mario
-          image: "{{ .Values.image.repository }}{{ .Values.image.digest }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
           ports:
             - containerPort: 80

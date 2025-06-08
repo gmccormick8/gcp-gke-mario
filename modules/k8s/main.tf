@@ -19,8 +19,8 @@ resource "helm_release" "mario" {
   values = [
     yamlencode({
       image = {
-        repository = split("@", var.image)[0]
-        digest        = split("@", var.image)[1]
+        repository = split(":", var.image)[0]
+        tag        = split(":", var.image)[1]
       }
       autoscaling = {
         min = var.min_replicas
