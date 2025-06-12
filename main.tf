@@ -234,6 +234,10 @@ resource "terraform_data" "gke_fw_cleanup" {
       fi
     EOT
   }
+
+  depends_on = [
+    module.gke_clusters
+  ]
 }
 
 # Cleanup dynamically created fleet memberships
@@ -259,4 +263,10 @@ resource "terraform_data" "fleet_membership_cleanup" {
       sleep 90
     EOT
   }
+
+  depends_on = [
+    module.gke_clusters,
+    google_gke_hub_feature.mcs,
+    google_gke_hub_feature.mci
+  ]
 }
