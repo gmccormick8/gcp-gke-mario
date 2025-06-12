@@ -1,6 +1,10 @@
 # GCP GKE Mario
 
-This project provides Infrastructure as Code (IaC) for deploying a highly-available browser-based Super Mario Web App leveraging modern cloud-native patterns including multi-cluster load balancing, Gateway API, and automated scaling. This project uses Zonal Google Kubernetes Engine (GKE) clusters, Helm charts, Multi-Cluster Services (MCS), and as well as a Global External Application Load Balancer across all clusters. This project is designed to run from the Google Cloud Shell using a user-friendly startup script. Simply clone this repository, run the script (following the prompts), and let Terraform do the rest!
+[![Run Super Linter](https://github.com/gmccormick8/gcp-gke-mario/actions/workflows/super-linter.yaml/badge.svg)](https://github.com/gmccormick8/gcp-gke-mario/actions/workflows/super-linter.yaml)
+
+This project provides Infrastructure as Code (IaC) for deploying a highly-available browser-based Super Mario Web App leveraging modern cloud-native patterns including multi-cluster load balancing, Gateway API, and automated scaling. 
+This project uses Zonal Google Kubernetes Engine (GKE) clusters, Helm charts, Multi-Cluster Services (MCS), and as well as a Global External Application Load Balancer across all clusters. 
+This project is designed to run from the Google Cloud Shell using a user-friendly startup script. Simply clone this repository, run the script (following the prompts), and let Terraform do the rest!
 
 ## Features
 
@@ -232,6 +236,12 @@ terraform destroy --auto-approve
 This implementation:
 
 - Has a Public Control Plane (whitelisted IPs, but still Public)
+  - This is intentional and secure for this use case
+  - Access is restricted to:
+    - Google Cloud Shell / Console IPs
+    - A single whitelisted IP for direct access
+  - No bastion host is required
+  - Terrascan rule AC_GCP_0041 is explicitly skipped
 - Uses HTTP (not HTTPS)
 - Is intended for development/testing purposes
 - Is not suitable for production use

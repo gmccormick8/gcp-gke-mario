@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,8 +17,8 @@ spec:
     spec:
       containers:
         - name: mario
-          image: "{{.Values.image.repository}}:{{.Values.image.tag}}"
-          imagePullPolicy: {{.Values.image.pullPolicy}}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
           ports:
             - containerPort: 80
           resources:
@@ -31,3 +32,5 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             privileged: false
+            seccompProfile:
+              type: RuntimeDefault

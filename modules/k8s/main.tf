@@ -23,8 +23,8 @@ resource "helm_release" "mario" {
         tag        = split(":", var.image)[1]
       }
       autoscaling = {
-        minReplicas = var.min_replicas
-        maxReplicas = var.max_replicas
+        min = var.min_replicas
+        max = var.max_replicas
       }
       gateway = {
         enable = var.config_cluster

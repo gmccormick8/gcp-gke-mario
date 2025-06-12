@@ -1,3 +1,4 @@
+---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -8,17 +9,17 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: mario
-  minReplicas: {{.Values.autoscaling.minReplicas}}
-  maxReplicas: {{.Values.autoscaling.maxReplicas}}
+  minReplicas: {{ .Values.autoscaling.minReplicas | default 1 }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas | default 5 }}
   metrics:
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: {{.Values.autoscaling.cpuUtilization}}
+          averageUtilization: {{ .Values.autoscaling.cpuUtilization | default 75 }}
   behavior:
     scaleUp:
-      stabilizationWindowSeconds: {{.Values.autoscaling.scaleUpStabilization}}
+      stabilizationWindowSeconds: {{ .Values.autoscaling.scaleUpStabilization | default 60 }}
     scaleDown:
-      stabilizationWindowSeconds: {{.Values.autoscaling.scaleDownStabilization}}
+      stabilizationWindowSeconds: {{ .Values.autoscaling.scaleDownStabilization | default 300 }}

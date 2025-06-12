@@ -88,6 +88,8 @@ module "prod-vpc" {
   }
 
   cloud_nat_configs = ["us-east5", "us-central1", "us-west4"]
+
+  depends_on = []
 }
 
 module "gke_clusters" {
@@ -105,9 +107,10 @@ module "gke_clusters" {
   public_ip              = var.public_ip
   min_node_count         = 1
   max_node_count         = 3
-  machine_type           = "e2-small"
+  machine_type           = "e2-medium"
   disk_size_gb           = 25
   disk_type              = "pd-standard"
+  environment            = "production"
 
   depends_on = [
     module.prod-vpc
@@ -121,8 +124,7 @@ resource "google_gke_hub_feature" "mcs" {
   location = "global"
 
   depends_on = [
-    module.gke_clusters,
-    terraform_data.fleet_membership_cleanup
+    module.gke_clusters
   ]
 }
 
@@ -243,18 +245,19 @@ resource "terraform_data" "fleet_membership_cleanup" {
   provisioner "local-exec" {
     when    = destroy
     command = <<EOT
-      echo "Unregistering clusters from fleet..."
-      for CLUSTER in central east west; do
-        gcloud container clusters update "$${CLUSTER}-cluster" \
+      for region in east central west; do
+        echo "Unregistering cluster: $region-cluster"
+        gcloud container fleet memberships delete $region-cluster \
           --project=${self.triggers_replace.project_id} \
-          --location=$(gcloud container clusters list --project=${self.triggers_replace.project_id} --filter="name=$${CLUSTER}-cluster" --format="value(location)") \
-          --unregister-fleet \
+          --location=global \
           --quiet || true
       done
-
-      # Wait for unregistration to complete
-      echo "Waiting 90 seconds for fleet unregistration to complete..."
-      sleep 90
     EOT
   }
+
+  depends_on = [
+    module.gke_clusters,
+    google_gke_hub_feature.mcs,
+    google_gke_hub_feature.mci
+  ]
 }

@@ -1,3 +1,4 @@
+---
 apiVersion: v2
 name: mario
 description: A Helm chart for Super Mario deployment

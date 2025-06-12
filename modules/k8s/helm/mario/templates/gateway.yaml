@@ -1,16 +1,18 @@
 {{- if .Values.gateway.enable }}
-kind: Gateway
+---
 apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
 metadata:
   name: mario-external-gateway
   namespace: mario
 spec:
   gatewayClassName: gke-l7-global-external-managed-mc
   listeners:
-  - name: http
-    protocol: HTTP
-    port: 80
-    allowedRoutes:
-      kinds:
-      - kind: HTTPRoute
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        kinds:
+          - kind: HTTPRoute
+            group: gateway.networking.k8s.io
 {{- end }}
