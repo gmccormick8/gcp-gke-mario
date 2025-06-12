@@ -88,6 +88,10 @@ module "prod-vpc" {
   }
 
   cloud_nat_configs = ["us-east5", "us-central1", "us-west4"]
+
+   depends_on = [
+    terraform_data.gke_fw_cleanup
+  ]
 }
 
 module "gke_clusters" {
@@ -139,7 +143,7 @@ resource "google_gke_hub_feature" "mci" {
   }
 
   depends_on = [
-    module.gke_clusters["central"],
+    module.gke_clusters,
     terraform_data.fleet_membership_cleanup
   ]
 }
@@ -220,7 +224,7 @@ resource "terraform_data" "gke_fw_cleanup" {
   provisioner "local-exec" {
     when    = destroy
     command = <<EOT
-      RULES=$(gcloud compute firewall-rules list --project=${self.triggers_replace.project_id} --filter='name~^gke-.*-.*-[0-9a-f]+-mcsd$' --format='value(name)')
+      RULES=$(gcloud compute firewall-rules list --project=${self.triggers_replace.project_id} --filter='name~^gke-.*mcsd$' --format='value(name)')
       if [ ! -z "$RULES" ]; then
         for RULE in $RULES; do
           echo "Deleting firewall rule: $RULE"
