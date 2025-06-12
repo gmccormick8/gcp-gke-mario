@@ -21,7 +21,6 @@ resource "google_project_iam_member" "gke_sa_container_admin_role" {
   member  = "serviceAccount:${google_service_account.gke_sa.email}"
 }
 
-
 # Create a Standard GKE cluster
 resource "google_container_cluster" "primary" {
   name     = var.cluster_name
@@ -35,8 +34,6 @@ resource "google_container_cluster" "primary" {
 
   remove_default_node_pool = true
   initial_node_count       = 1
-
-  enable_intranode_visibility = true
 
   ip_allocation_policy {
     cluster_secondary_range_name  = var.pods_network_name
@@ -59,12 +56,6 @@ resource "google_container_cluster" "primary" {
     workload_pool = "${var.project_id}.svc.id.goog"
   }
 
-  master_auth {
-    client_certificate_config {
-      issue_client_certificate = false
-    }
-  }
-
   private_cluster_config {
     enable_private_nodes    = true
     enable_private_endpoint = false
@@ -75,7 +66,6 @@ resource "google_container_cluster" "primary" {
   # 1. Google Compute Engine Public IPs (for Cloud Shell and Console access)
   # 2. A single whitelisted IP (for direct kubectl access)
   # This provides secure control plane access without requiring a bastion host
-  #ts:skip=AC_GCP_0292
   master_authorized_networks_config {
     gcp_public_cidrs_access_enabled = true # Allow Google Compute Engine Public IPs
     cidr_blocks {
@@ -84,21 +74,12 @@ resource "google_container_cluster" "primary" {
     }
   }
 
-  network_policy {
-    enabled = true
-  }
-
   binary_authorization {
     evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
   }
 
   release_channel {
     channel = "REGULAR"
-  }
-
-  resource_labels = {
-    "k8s-cluster" = var.cluster_name
-    "environment" = var.environment
   }
 }
 
@@ -128,10 +109,6 @@ resource "google_container_node_pool" "primary_nodes" {
     shielded_instance_config {
       enable_secure_boot          = true
       enable_integrity_monitoring = true
-    }
-
-    workload_metadata_config {
-      mode = "GKE_METADATA"
     }
   }
 
