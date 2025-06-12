@@ -231,7 +231,7 @@ resource "terraform_data" "gke_fw_cleanup" {
     EOT
   }
 
-  depends_on = [ moodule.prod-vpc ]
+  depends_on = [ module.prod-vpc ]
 }
 
 # Cleanup dynamically created fleet memberships
