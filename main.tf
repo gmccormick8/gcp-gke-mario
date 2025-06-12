@@ -223,7 +223,7 @@ resource "terraform_data" "gke_fw_cleanup" {
   provisioner "local-exec" {
     when    = destroy
     command = <<EOT
-      RULES=$(gcloud compute firewall-rules list --project=${self.triggers_replace.project_id} --filter='name~^gke-.*mcsd$' --format='value(name)')
+      RULES=$(gcloud compute firewall-rules list --project=${self.triggers_replace.project_id} --filter='^gke-.*mcsd$' --format='value(name)')
       if [ ! -z "$RULES" ]; then
         for RULE in $RULES; do
           echo "Deleting firewall rule: $RULE"
@@ -234,10 +234,6 @@ resource "terraform_data" "gke_fw_cleanup" {
       fi
     EOT
   }
-
-  depends_on = [
-    module.gke_clusters
-  ]
 }
 
 # Cleanup dynamically created fleet memberships
@@ -263,10 +259,4 @@ resource "terraform_data" "fleet_membership_cleanup" {
       sleep 90
     EOT
   }
-
-  depends_on = [
-    module.gke_clusters,
-    google_gke_hub_feature.mcs,
-    google_gke_hub_feature.mci
-  ]
 }
