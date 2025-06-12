@@ -1,4 +1,3 @@
----
 apiVersion: net.gke.io/v1
 kind: ServiceExport
 metadata:
