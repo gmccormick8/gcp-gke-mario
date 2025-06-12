@@ -72,9 +72,3 @@ variable "disk_type" {
   type        = string
   default     = "pd-standard"
 }
-
-variable "environment" {
-  description = "Environment label for the cluster (e.g., production, staging, development)"
-  type        = string
-  default     = "development"
-}
