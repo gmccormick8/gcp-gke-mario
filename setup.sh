@@ -23,7 +23,18 @@ if [ $# -eq 1 ]; then
 fi
 
 echo "Setting up the environment..."
-echo -e 'project_id = "'"$DEVSHELL_PROJECT_ID"'"\npublic_ip = "'"$(curl -s ifconfig.me)"'"' > terraform.tfvars
+# Check and set PROJECT_ID
+if [ -n "$DEVSHELL_PROJECT_ID" ]; then
+  export PROJECT_ID="$DEVSHELL_PROJECT_ID"
+  echo "Using Cloud Shell Project ID: '$PROJECT_ID'"
+elif [ -z "$PROJECT_ID" ]; then
+  echo "Error: PROJECT_ID is not set. Please set the PROJECT_ID environment variable or run from Google Cloud Console."
+  exit 1
+fi
+
+echo "Using Project ID: '$PROJECT_ID'"
+
+echo -e 'project_id = "'"$PROJECT_ID"'"\npublic_ip = "'"$(curl -s ifconfig.me)"'"' > terraform.tfvars
 
 api_array=(
   "compute.googleapis.com"
