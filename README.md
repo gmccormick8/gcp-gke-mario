@@ -54,7 +54,7 @@ This project provides Infrastructure as Code (IaC) for deploying a highly-availa
 1. Clone this repository:
 
 ```bash
-git clone https://github.com/gabrielmccormick/gcp-gke-mario.git && cd gcp-gke-mario
+git clone https://github.com/gmccormick8/gcp-gke-mario.git && cd gcp-gke-mario
 ```
 
 2. Run the setup script using either:
